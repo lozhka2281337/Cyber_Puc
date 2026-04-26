@@ -49,7 +49,8 @@ class GunWeapon(Weapon):
                 angle = (i - (self.count - 1) / 2) * self.spread
 
             b = Bullet(start_x, start_y, target_x, target_y, 
-                       self.b_speed, self.b_color, angle, self.b_range)
+                       self.b_speed, self.b_color, self.damage, angle, self.b_range)
+    
             bullets.append(b)
 
         return bullets

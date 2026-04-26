@@ -23,9 +23,7 @@ class Player:
             LaserWeapon("Defrag", 100, 20, 1, 2500, duration=800, beam_width=14, color=(0, 255, 255), charge_time=400)
         ]
         
-        
         self.current_weapon_idx = 0
-
     
     def shot(self, camera_x: int, camera_y: int) -> list:
         

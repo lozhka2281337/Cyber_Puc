@@ -87,12 +87,13 @@ class Game:
             for enemy in self.enemies[:]: 
                 if bullet.rect.colliderect(enemy.rect):
                     if enemy in self.enemies:
-                        self.enemies.remove(enemy)
+                        enemy.get_damage(bullet.damage)
+                        if enemy.hp <= 0: self.enemies.remove(enemy)
                     if bullet in self.bullets:
                         self.bullets.remove(bullet)
                     break
 
-    def process_enemies(self):
+    def process_player_damage(self):
         for enemy in self.enemies:
             if enemy.rect.colliderect(self.player.rect):
                 self.player.get_damage()
@@ -164,9 +165,9 @@ class Game:
             enemy.update(dt, self.player, self.walls)
 
         self.process_bullets()
-        self.process_enemies()
+        self.process_player_damage()
         
-        self.process_laser_damage()
+        #self.process_laser_damage()
 
     def draw(self, camera_x, camera_y):
         self.screen.fill("purple")

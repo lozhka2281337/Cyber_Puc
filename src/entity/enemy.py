@@ -1,21 +1,20 @@
 import pygame
 import random
 
-from config import ENEMY_SIZE, ENEMY_NORMAL_COLOR, ENEMY_NORMAL_HP, ENEMY_SCOUT_COLOR, ENEMY_SCOUT_HP
+from config import ENEMY_SIZE, ENEMY_SCOUT_COLOR, ENEMY_SCOUT_SPEED, ENEMY_SCOUT_HP
 
 class Enemy:
     def __init__(self, x, y):
         self.pos = pygame.math.Vector2(x, y)
         self.rect = pygame.Rect(x, y, ENEMY_SIZE, ENEMY_SIZE)
         
-        self.speed = ENEMY_SCOUT_HP
+        self.hp = ENEMY_SCOUT_HP
+        self.speed = ENEMY_SCOUT_SPEED
         self.color = ENEMY_SCOUT_COLOR
 
-        # вектор, по которому враг блуждает без дела
-        self.wander_dir = pygame.math.Vector2(0, 0)
-        self.state = "wander"
-        self.timer = 0
-
+        self.wander_dir = pygame.math.Vector2(0, 0) # вектор, по которому враг блуждает без дела
+        self.timer = 0                              # таймер, который говорит, когда нужно менять направление для блуждания
+ 
     def move(self, walls: list, sees_player: bool, dt: int, direction: pygame.math.Vector2):
         self.pos.x += direction.x * self.speed * dt
         self.rect.x = round(self.pos.x)
@@ -39,6 +38,8 @@ class Enemy:
                 self.pos.y = self.rect.y
                 if not sees_player: self.timer = 0
 
+    def get_damage(self, damage):
+        self.hp -= damage
 
     def check_los(self, target_rect, walls): 
         # функция проверяет - есть ли между врагом и игроком стена
@@ -57,12 +58,9 @@ class Enemy:
         # если есть - враг начинает двигаться в сторону игрока,
         # иначе меняется вектор для блуждания
 
-        if sees_player:
-            self.state = "chase"
-            direction = pygame.math.Vector2(player.rect.centerx - self.rect.centerx, 
-                                            player.rect.centery - self.rect.centery)
+        if sees_player: direction = pygame.math.Vector2(player.rect.centerx - self.rect.centerx, 
+                                                        player.rect.centery - self.rect.centery)
         else:
-            self.state = "wander"
             if self.timer <= 0:
                 self.timer = random.uniform(1.0, 2.5) 
                 self.wander_dir = pygame.math.Vector2(random.uniform(-1, 1), random.uniform(-1, 1))
