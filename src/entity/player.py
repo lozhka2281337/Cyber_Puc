@@ -2,7 +2,7 @@ import pygame
 import math
 
 from .bullet import Bullet
-from .weapon import GunWeapon, LaserWeapon
+from .weapon import GunWeapon, LaserWeapon, MeleeWeapon, GrenadeWeapon
 
 from config import PLAYER_SPEED, PLAYER_HP, PLAYER_SIZE, PLAYER_COLOR
 
@@ -20,7 +20,9 @@ class Player:
         self.inventory = [
             GunWeapon("Scanner", 50, 20, 10, 400, 800, (255, 255, 0)), 
             GunWeapon("Firewall", 50, 20, 5, 1100, 550, (255, 100, 0), spread=15, count=5, b_range=280), 
-            LaserWeapon("Defrag", 100, 20, 1, 2500, duration=800, beam_width=14, color=(0, 255, 255), charge_time=400)
+            LaserWeapon("Defrag", 100, 20, 1, 2500, duration=800, beam_width=14, color=(0, 255, 255), charge_time=400),
+            MeleeWeapon("USB-Katana", 150, 20, 1, 400, reach=70, arc_degrees=140, color=(255, 255, 255)),
+            GrenadeWeapon("Zip-Bomb", 200, 20, 1, 1000, throw_speed=400, blast_radius=70, fuse_time=1000, max_range=350)
         ]
         
         self.current_weapon_idx = 0

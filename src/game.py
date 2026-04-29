@@ -69,6 +69,7 @@ class Game:
         self.handler.process_bullets()
         self.handler.process_player_damage(self)
         self.handler.process_laser_damage()
+        self.handler.process_melee_damage()
 
     """ главная функция """
 
