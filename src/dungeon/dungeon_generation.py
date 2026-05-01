@@ -48,3 +48,17 @@ class DungeonGeneration:
             for x in range(MAP_WIDTH):
                 if self.dungeon_map[y][x] == 0:
                     return x * TILE_SIZE, y * TILE_SIZE
+                    
+        return TILE_SIZE, TILE_SIZE
+
+    def get_random_floor_coords(self, count):
+        floors = []
+        
+        for y in range(MAP_HEIGHT):
+            for x in range(MAP_WIDTH):
+                if self.dungeon_map[y][x] == 0:
+                    floors.append((x * TILE_SIZE, y * TILE_SIZE))
+        
+        if len(floors) < count:
+            return floors
+        return random.sample(floors, count)

@@ -1,16 +1,15 @@
 import pygame
 
-from entity.enemy import Enemy
+from entity.enemy_type import Swarm, Tank, Shooter
 from entity.player import Player
 from entity.weapon import LaserWeapon 
 from dungeon.dungeon_generation import DungeonGeneration as dg
-
 from renderer import Renderer
 from handler import Handler
 
 from config import (SCREEN_WIDTH, SCREEN_HEIGHT, MAP_WIDTH, MAP_HEIGHT, 
                     SPAWN_ENEMY_EVENT, SPAWN_ENEMY_TIME, 
-                    FPS, SHOT_DELAY, BLUE_WALL, TILE_SIZE)
+                    FPS, SHOT_DELAY, BLUE_WALL, TILE_SIZE, ENEMY_SIZE)
 
 
 class Game:
@@ -40,19 +39,29 @@ class Game:
 
         self.running = True
 
-        """ потом убрать"""
-        #self.enemies.append(Enemy(100, 100))
-        #self.enemies.append(Enemy(-200, 100))
-        #self.enemies.append(Enemy(-500, 100))
-        #self.walls.append(pygame.Rect(100, -250, 50, 500))
-        #self.walls.append(pygame.Rect(-200, -250, 50, 500))
-        #self.walls.append(pygame.Rect(-500, -250, 50, 500))
+        # УМНЫЙ СПАВН ВРАГОВ
+        safe_spots = self.dungeon_generator.get_random_floor_coords(20)
+        
+        for i, (spot_x, spot_y) in enumerate(safe_spots):
+            dist_x = abs(spot_x - start_x)
+            dist_y = abs(spot_y - start_y)
+            
+            if dist_x > 300 or dist_y > 300:
+                spawn_x = spot_x + (TILE_SIZE - ENEMY_SIZE) // 2
+                spawn_y = spot_y + (TILE_SIZE - ENEMY_SIZE) // 2
+                
+                # РАСПРЕДЕЛЕНИЕ ТИПОВ ВРАГОВ
+                roll = i % 4
+                if roll == 0:
+                    self.enemies.append(Tank(spawn_x, spawn_y))
+                elif roll == 1:
+                    self.enemies.append(Shooter(spawn_x, spawn_y)) 
+                else:
+                    self.enemies.append(Swarm(spawn_x, spawn_y))
 
     def death_player(self):
         self.renderer.draw_death_screen()
-        
         self.new_game()
-
 
     def update(self, dt: float):
         self.player.update(dt, self.walls)
@@ -64,9 +73,9 @@ class Game:
             bullet.update(dt)
 
         for enemy in self.enemies:
-            enemy.update(dt, self.player, self.walls)
+            enemy.update(dt, self.player, self.walls, self.bullets)
 
-        self.handler.process_bullets()
+        self.handler.process_bullets(self)
         self.handler.process_player_damage(self)
         self.handler.process_laser_damage()
         self.handler.process_melee_damage()
@@ -76,6 +85,9 @@ class Game:
     def run(self):
         while self.running:
             dt = self.clock.tick(FPS) / 1000.0  
+            
+            if dt > 0.05: 
+                dt = 0.05
 
             camera_x = int(self.player.rect.x + 16 - SCREEN_WIDTH / 2)
             camera_y = int(self.player.rect.y + 16 - SCREEN_HEIGHT / 2)

@@ -33,9 +33,9 @@ class Player:
         
         return current_weapon.shot(self.pos, camera_x, camera_y)
         
-    def get_damage(self):
+    def get_damage(self, damage=1):
         if self.invulnerable_timer <= 0: 
-            self.hp -= 1
+            self.hp -= damage
             self.invulnerable_timer = 3.0
 
     def movement(self, direction: pygame.math.Vector2, dt: float, walls: list):
