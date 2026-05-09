@@ -8,8 +8,8 @@ BLACK = (20, 20, 25)
 WHITE = (255, 255, 255)
 BLUE_WALL = (100, 150, 200)
 
-MAP_WIDTH = 3200  
-MAP_HEIGHT = 2400
+MAP_WIDTH = 320#640
+MAP_HEIGHT = 240#480
 
 SPAWN_ENEMY_EVENT = pygame.event.custom_type()
 SPAWN_ENEMY_TIME = 1800
@@ -27,6 +27,14 @@ PLAYER_SIZE = 32
 PLAYER_COLOR = (0, 255, 100)
 SHOT_DELAY = 300
 INVULNERABLE_TIMER = 3.0
+
+
+""" оружие """
+SCANNER = "Scanner"
+FIREWALL = "Firewall"
+DEFRAG = "Defrag" 
+MELEE = "USB-Katana" 
+ZIP_BOMB = "Zip-Bomb"
 
 
 """ враги """

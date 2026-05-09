@@ -15,7 +15,6 @@ class Player:
         self.hp = PLAYER_HP
 
         self.invulnerable_timer = 0 # таймер для щита бессмертия, появляющийся после получения урона
-
         
         self.inventory = [
             GunWeapon("Scanner", 50, 20, 10, 400, 800, (255, 255, 0)), 
@@ -28,7 +27,6 @@ class Player:
         self.current_weapon_idx = 0
     
     def shot(self, camera_x: int, camera_y: int) -> list:
-        
         current_weapon = self.inventory[self.current_weapon_idx]
         
         return current_weapon.shot(self.pos, camera_x, camera_y)

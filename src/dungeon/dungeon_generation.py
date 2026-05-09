@@ -9,9 +9,9 @@ MAP_HEIGHT = 100
 # ГЕНЕРАЦИЯ УРОВНЯ (
 
 class DungeonGeneration:
-    def __init__(self, walls, n=4000):
+    def __init__(self, world, n=4000):
         self.n = n
-        self.walls = walls
+        self.walls = world.walls
 
         self.dungeon_map = [[1 for _ in range(MAP_WIDTH)] for _ in range(MAP_HEIGHT)]
         self.directions = [[0, 1], [1, 0], [-1, 0], [0, -1]]

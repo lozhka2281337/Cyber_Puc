@@ -4,6 +4,8 @@ from entity.enemy_type import Swarm, Tank, Shooter
 from entity.player import Player
 from entity.weapon import LaserWeapon 
 from dungeon.dungeon_generation import DungeonGeneration as dg
+
+from world import World
 from renderer import Renderer
 from handler import Handler
 
@@ -25,17 +27,14 @@ class Game:
         self.new_game()
 
     def new_game(self):
-        self.bullets = []
-        self.health_packs = []
-        self.enemies = []
-        self.walls = []
+        self.world = World()
 
-        self.dungeon_generator = dg(self.walls)
+        self.dungeon_generator = dg(self.world)
         start_x, start_y = self.dungeon_generator.get_start_coord()
 
         self.player = Player(start_x, start_y)
-        self.renderer = Renderer(self.screen, self.player, self.walls, self.bullets, self.enemies)
-        self.handler = Handler(self.player, self.walls, self.bullets, self.enemies)
+        self.renderer = Renderer(self.screen, self.player, self.world)
+        self.handler = Handler(self.player, self.world)
 
         self.running = True
 
@@ -53,29 +52,35 @@ class Game:
                 # РАСПРЕДЕЛЕНИЕ ТИПОВ ВРАГОВ
                 roll = i % 4
                 if roll == 0:
-                    self.enemies.append(Tank(spawn_x, spawn_y))
+                    self.world.enemies.append(Tank(spawn_x, spawn_y))
                 elif roll == 1:
-                    self.enemies.append(Shooter(spawn_x, spawn_y)) 
+                    self.world.enemies.append(Shooter(spawn_x, spawn_y)) 
                 else:
-                    self.enemies.append(Swarm(spawn_x, spawn_y))
+                    self.world.enemies.append(Swarm(spawn_x, spawn_y))
 
     def death_player(self):
         self.renderer.draw_death_screen()
         self.new_game()
 
     def update(self, dt: float):
-        self.player.update(dt, self.walls)
+        self.player.update(dt, self.world.walls)
 
         for weapon in self.player.inventory:
             weapon.update()
 
-        for bullet in self.bullets:
+        for bullet in self.world.bullets:
             bullet.update(dt)
 
-        for enemy in self.enemies:
-            enemy.update(dt, self.player, self.walls, self.bullets)
+        for grenade in self.world.grenades:
+            grenade.update(dt)
 
-        self.handler.process_bullets(self)
+        for effect in self.world.effects:
+            effect.update(dt)
+
+        for enemy in self.world.enemies:
+            enemy.update(dt, self.player, self.world)
+
+        self.handler.process_elements(self)
         self.handler.process_player_damage(self)
         self.handler.process_laser_damage()
         self.handler.process_melee_damage()

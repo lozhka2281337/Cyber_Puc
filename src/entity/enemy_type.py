@@ -6,7 +6,6 @@ from config import (ENEMY_SWARM_HP, ENEMY_SWARM_SPEED, ENEMY_SWARM_COLOR, ENEMY_
                     ENEMY_TANK_HP, ENEMY_TANK_SPEED, ENEMY_TANK_COLOR, ENEMY_TANK_ATTACK_RANGE, ENEMY_TANK_DAMAGE,
                     ENEMY_SHOOTER_HP, ENEMY_SHOOTER_SPEED, ENEMY_SHOOTER_COLOR, ENEMY_SHOOTER_ATTACK_RANGE, ENEMY_SHOOTER_DAMAGE)
 
-
 # 1. SWARM (Быстрый бегун, берет количеством)
 class Swarm(Enemy):
     def __init__(self, x: int, y: int):
@@ -33,8 +32,8 @@ class Shooter(Enemy):
         self.shoot_cooldown = 1500 
 
     # Принимаем пули 
-    def update(self, dt: float, player, walls: list[pygame.Rect], bullets: list = None) -> None: 
-        sees_player = self.check_los(player.rect, walls)
+    def update(self, dt: float, player, world) -> None: 
+        sees_player = self.check_los(player.rect, world.walls)
         direction = pygame.math.Vector2(0, 0)
         if sees_player: 
             vec_to_player = pygame.math.Vector2(player.rect.centerx - self.rect.centerx, 
@@ -50,16 +49,15 @@ class Shooter(Enemy):
                 current_time = pygame.time.get_ticks()
                 
                 # Что-то типо предохранителя
-                if current_time - self.last_shot_time >= self.shoot_cooldown and bullets is not None:
+                if current_time - self.last_shot_time >= self.shoot_cooldown and world.bullets is not None:
                     self.last_shot_time = current_time
-                    self._shoot(player, bullets)     
+                    self._shoot(player, world.bullets)     
 
         if direction.magnitude() > 0:
             direction = direction.normalize()
-        self.move(walls, dt, direction)
+        self.move(world.walls, dt, direction)
         
     def _shoot(self, player, bullets: list) -> None:
-        # Сборка пули
         new_bullet = Bullet(self.rect.centerx, self.rect.centery, 
                             player.rect.centerx, player.rect.centery, 
                             400, (255, 50, 50), self.damage)

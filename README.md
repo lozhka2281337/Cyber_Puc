@@ -1,11 +1,12 @@
 ## Структура проекта
 ```text
-├── src/
+├src/
 │   ├── dungeon/ 
 │   │   └── generation_dungeon.py 
-│   └── entity/  классы сущностей
+│   └── entity/     классы сущностей
 │       ├── bullet.py
-│       ├── enemy.py
+│       ├── enemy.py        основной класс врагов
+|       ├── enemy_type.py   наследованные классы врагов
 │       ├── items.py
 |       ├── weapon.py
 │       └── player.py
@@ -15,6 +16,8 @@
 ├── config.py/   константы
 ├── game.py/     класс самой игры
 ├── renderer.py/ класс отрисовки
+├── handler.py   класс-обработчик
+├── world.py     класс с массивами объектов на карте 
 └── main.py/     точка входа 
 ```
 

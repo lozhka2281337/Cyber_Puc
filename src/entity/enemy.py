@@ -39,8 +39,8 @@ class Enemy:
                 return False
         return True 
 
-    def update(self, dt: float, player, walls: list[pygame.Rect], bullets: list = None) -> None:
-        sees_player = self.check_los(player.rect, walls)
+    def update(self, dt: float, player, world) -> None:
+        sees_player = self.check_los(player.rect, world.walls)
         direction = pygame.math.Vector2(0, 0)
         
         if sees_player: 
@@ -50,7 +50,7 @@ class Enemy:
         if direction.magnitude() > 0:
             direction = direction.normalize()
             
-        self.move(walls, dt, direction)
+        self.move(world.walls, dt, direction)
 
     def draw(self, surface: pygame.Surface, cam_x: float, cam_y: float) -> None:
         offset_rect = self.rect.move(-cam_x, -cam_y)
