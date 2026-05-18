@@ -3,6 +3,7 @@ import math
 
 from .bullet import Bullet
 from .weapon import GunWeapon, LaserWeapon, MeleeWeapon, GrenadeWeapon
+from .animation import Animation # здесь подключаем наш класс анимации
 
 from config import PLAYER_SPEED, PLAYER_HP, PLAYER_SIZE, PLAYER_COLOR
 
@@ -25,6 +26,11 @@ class Player:
         ]
         
         self.current_weapon_idx = 0
+
+        # Система анимации 
+        self.anim = Animation("assets/main-Sheet.png", columns=6, speed=0.07, scale=1.5)
+        # По умолчанию будем смотреть вправо, так как парни на лево не ходят.  
+        self.flip_x = True 
     
     def shot(self, camera_x: int, camera_y: int, world) -> None:
         current_weapon = self.inventory[self.current_weapon_idx]
@@ -82,20 +88,40 @@ class Player:
         if keys[pygame.K_a] or keys[pygame.K_LEFT]: direction.x -= 1
         if keys[pygame.K_d] or keys[pygame.K_RIGHT]: direction.x += 1
 
+        # Поворот спрайта 
+        if direction.x < 0:
+            self.flip_x = False 
+        elif direction.x > 0:
+            self.flip_x = True 
+
         self.movement(direction, dt, walls)
+
+        # Обновление кадров 
+        if direction.magnitude() > 0:
+            self.anim.update(dt) 
+        else:
+            self.anim.current_idx = 0 
 
         # обновление таймера для щита бессмертия
         if self.invulnerable_timer > 0:
             self.invulnerable_timer -= dt
 
-
     def draw(self, surface: pygame.Surface, cam_x: float, cam_y: float):
         screen_x = self.rect.x - cam_x
         screen_y = self.rect.y - cam_y
         
-        pygame.draw.rect(surface, self.color, (screen_x, screen_y, self.rect.width, self.rect.height))
-        pygame.draw.rect(surface, (0, 0, 0), (screen_x + 6, screen_y + 8, 6, 6))
-        pygame.draw.rect(surface, (0, 0, 0), (screen_x + 20, screen_y + 8, 6, 6))
+        #  Отрисовка спрайта вместо квадратов, короче тут получаем нужный кадр( если нужно ,то перевернутый)
+        frame = self.anim.get_frame(self.flip_x)
+        
+        # Вычисляем центр хитбокса
+        center_x = screen_x + self.rect.width // 2
+        center_y = screen_y + self.rect.height // 2
+        
+        # Центруем ее по хитбоксу 
+        frame_rect = frame.get_rect(center=(center_x, center_y))
+        
+        # Рисуем
+        surface.blit(frame, frame_rect)
 
         if self.invulnerable_timer > 0: self.draw_shield(surface, screen_x, screen_y)
 
