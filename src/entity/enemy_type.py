@@ -1,7 +1,7 @@
 import pygame
+from core.animation import Animation
 from .enemy import Enemy
 from .bullet import Bullet 
-
 from config import (ENEMY_SWARM_HP, ENEMY_SWARM_SPEED, ENEMY_SWARM_COLOR, ENEMY_SWARM_ATTACK_RANGE,
                     ENEMY_TANK_HP, ENEMY_TANK_SPEED, ENEMY_TANK_COLOR, ENEMY_TANK_ATTACK_RANGE, ENEMY_TANK_DAMAGE,
                     ENEMY_SHOOTER_HP, ENEMY_SHOOTER_SPEED, ENEMY_SHOOTER_COLOR, ENEMY_SHOOTER_ATTACK_RANGE, ENEMY_SHOOTER_DAMAGE)
@@ -12,6 +12,30 @@ class Swarm(Enemy):
         super().__init__(x, y, ENEMY_SWARM_HP, ENEMY_SWARM_SPEED, ENEMY_SWARM_COLOR)
         self.attack_range = ENEMY_SWARM_ATTACK_RANGE
         self.damage = 1
+        self.anim_left = Animation("assets/fast-enemy-run-left.png", columns=5, speed=0.1, scale=1.5)
+        self.anim_right = Animation("assets/fast-enemy-run-right.png", columns=5, speed=0.1, scale=1.5)
+        self.current_anim = self.anim_right 
+
+    def update(self, dt: float, player, world) -> None:
+        super().update(dt, player, world)
+        
+        if player.rect.centerx < self.rect.centerx:
+            self.current_anim = self.anim_left
+        else:
+            self.current_anim = self.anim_right   
+        if self.is_moving:
+            self.current_anim.update(dt)
+        else:
+            self.current_anim.current_idx = 0
+
+    def draw(self, surface: pygame.Surface, cam_x: float, cam_y: float) -> None:
+        frame = self.current_anim.get_frame()
+        screen_x = self.rect.x - cam_x
+        screen_y = self.rect.y - cam_y
+        center_x = screen_x + self.rect.width // 2
+        center_y = screen_y + self.rect.height // 2
+        frame_rect = frame.get_rect(center=(center_x, center_y))  
+        surface.blit(frame, frame_rect)
 
 
 # 2. TANK (Медленный, толстый, бьет больно)

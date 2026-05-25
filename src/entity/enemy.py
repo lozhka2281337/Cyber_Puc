@@ -4,15 +4,16 @@ from config import ENEMY_SIZE
 class Enemy:
     def __init__(self, x: int, y: int, hp: int, speed: int, color: tuple):
         self.pos = pygame.math.Vector2(x, y)
-        self.rect = pygame.Rect(x, y, ENEMY_SIZE, ENEMY_SIZE)
-        
+        self.rect = pygame.Rect(x, y, ENEMY_SIZE, ENEMY_SIZE)       
         self.hp = hp
         self.speed = speed
         self.color = color
-
         self.knockback = pygame.math.Vector2(0, 0)
+        self.is_moving = False 
 
     def move(self, walls: list[pygame.Rect], dt: float, direction: pygame.math.Vector2) -> None:
+        old_pos = pygame.math.Vector2(self.pos)
+        
         velocity_x = direction.x * self.speed + self.knockback.x
         velocity_y = direction.y * self.speed + self.knockback.y
 
@@ -40,6 +41,8 @@ class Enemy:
             self.knockback = self.knockback.lerp(pygame.math.Vector2(0, 0), dt * 10)
         else:
             self.knockback.x, self.knockback.y = 0, 0
+            
+        self.is_moving = old_pos.distance_to(self.pos) > 0.01
 
     def get_damage(self, damage: int) -> None:
         self.hp -= damage
@@ -57,8 +60,7 @@ class Enemy:
         
         if sees_player: 
             direction = pygame.math.Vector2(player.rect.centerx - self.rect.centerx, 
-                                            player.rect.centery - self.rect.centery)
-            
+                                            player.rect.centery - self.rect.centery)       
         if direction.magnitude() > 0:
             direction = direction.normalize()
             
