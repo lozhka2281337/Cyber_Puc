@@ -10,7 +10,6 @@ class SparkEffect:
         self.color = color
         self.spawn_time = pygame.time.get_ticks()
         self.duration = 150
-        self.is_alive = True
         
         self.is_effect = True 
         
@@ -24,9 +23,9 @@ class SparkEffect:
                 'radius': random.uniform(2, 5)
             })
 
-    def update(self, dt):
+    def update(self, effects, dt):
         if pygame.time.get_ticks() - self.spawn_time > self.duration:
-            self.is_alive = False
+            effects.remove(self)
             return
             
         for s in self.sparks:

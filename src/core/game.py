@@ -65,15 +65,17 @@ class Game:
         self.player.update(dt, self.world)
 
         for bullet in self.world.bullets:
-            bullet.update(dt)
+            bullet.update(self.world, self.player, dt)
+
         for grenade in self.world.grenades:
-            grenade.update(dt)
+            grenade.update(self.world, self.camera, dt)
+  
         for effect in self.world.effects:
-            effect.update(dt)
+            effect.update(self.world.effects, dt)
+   
         for enemy in self.world.enemies:
             enemy.update(dt, self.player, self.world)
 
-        self.handler.process_elements(self.camera)
         self.player.process_weapon_damage(self.world.enemies, self.world.walls)
         self.world.enemies[:] = [enemy for enemy in self.world.enemies if enemy.hp > 0]
         
@@ -93,9 +95,7 @@ class Game:
 
     def run(self):
         while self.running:
-            dt = self.clock.tick(FPS) / 1000.0  
-            if dt > 0.05: 
-                dt = 0.05
+            dt = min(0.05, self.clock.tick(FPS) / 1000.0)
 
             cam_x, cam_y = self.camera.get_offset(self.player.rect, dt)
             

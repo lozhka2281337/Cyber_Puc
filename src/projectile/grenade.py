@@ -18,18 +18,23 @@ class Grenade(Bullet):
         dist_to_target = self.start_pos.distance_to(target_pos)
         self.target_dist = min(dist_to_target, max_range)
 
-    def update(self, dt):
+    def update(self, world, camera, dt):
         if self.is_moving:
             if self.pos.distance_to(self.start_pos) < self.target_dist:
                 self.pos += self.direction * self.speed * dt
                 self.rect.centerx = round(self.pos.x)
                 self.rect.centery = round(self.pos.y)
+
+                for wall in world.walls:
+                    if self.rect.colliderect(wall):
+                        self.is_moving = False
+                        break 
             else:
-                self.is_moving = False 
+                self.is_moving = False
                 
         current_time = pygame.time.get_ticks()
         if current_time - self.spawn_time >= self.fuse_time:
-            self.exploded = True
+            self._grenade_is_boom(world, camera)
 
     def draw(self, surface, cam_x, cam_y):
         offset_rect = self.rect.move(-cam_x, -cam_y)
