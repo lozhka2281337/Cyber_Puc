@@ -21,7 +21,7 @@ class Bullet:
         self._correct_direction(angle_offset)
 
     def update(self, world, player, dt):
-        self._movenment(world, dt)
+        self._movenment(dt)
         
         if self._check_max_dist(world): return
         if self._check_wall_colide(world): return 
