@@ -27,13 +27,16 @@ class Tank(AnimatedEnemy):
         self.current_anim = self.anim_right
 
 # 3. SHOOTER (Держит дистанцию, стреляет)
-class Shooter(Enemy):
+class Shooter(AnimatedEnemy):
     def __init__(self, x: int, y: int):
         super().__init__(x, y, ENEMY_SHOOTER_HP, ENEMY_SHOOTER_SPEED, ENEMY_SHOOTER_COLOR)
         self.attack_range = ENEMY_SHOOTER_ATTACK_RANGE
         self.damage = ENEMY_SHOOTER_DAMAGE
         self.last_shot_time = 0
         self.shoot_cooldown = 1500
+        self.anim_left = Animation("assets/shooter-left-run-Sheet.png", columns=6, speed=0.25, scale=1.5)
+        self.anim_right = Animation("assets/shooter-right-run-Sheet.png", columns=6, speed=0.25, scale=1.5)
+        self.current_anim = self.anim_right
 
     def _handle_chase(self, player, world, dt: float) -> pygame.math.Vector2:
 
