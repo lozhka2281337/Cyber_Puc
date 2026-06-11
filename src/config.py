@@ -117,3 +117,17 @@ LOSE_AGRO_DISTANCE = 600    # Дистанция, на которой забыв
 WAYPOINT_TOLERANCE = 10     # Погрешность прибытия на точку (в пикселях)
 
 INITIAL_ENEMY_COUNT = 15    # Точное количество врагов при генерации уровня 
+
+
+""" меню """
+COLOR_BG = (10, 12, 18)
+COLOR_TEXT_MUTED = (70, 80, 95)
+COLOR_NEON_GREEN = (0, 255, 150)
+COLOR_NEON_BLUE = (0, 200, 255)
+COLOR_NEON_RED = (255, 50, 80)
+
+GAME_TITLE = "CYBER PUK: 2067"
+START_GAME_BUTTON = "ЗАПУСТИТЬ СЕРВЕР"
+SETTINGS_BUTTON = "НАСТРОЙКИ СЕТИ"
+EXIT_BUTTON = "ПОКИНУТЬ СЕРВЕР"
+DEFAULT_MENU_BUTTON = "МЕНЮ"
