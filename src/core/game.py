@@ -1,14 +1,14 @@
 import pygame
 
-from dungeon.dungeon_generation import DungeonGeneration as dg
 from dungeon.BSP.BSP_generation import BSPGeneration as BSP
 from entity.player import Player
+
 from core.world import World
 from core.renderer import Renderer
 from core.handler import Handler
 from core.camera import Camera 
-
 from core.spawner import Spawner
+from core.menu import MainMenu
 
 import config as cfg
 
@@ -22,9 +22,10 @@ class Game:
         self.FONT = pygame.font.SysFont("Arial", 32, bold = True)
         self.clock = pygame.time.Clock()
 
-        self.new_game()
+        self.menu = MainMenu(self.screen)
+        self._new_game()
 
-    def new_game(self):
+    def _new_game(self):
         self.world = World()
         self.dungeon_generator = BSP(self.world)
         self.dungeon_generator.generate_dungeon()
@@ -41,11 +42,11 @@ class Game:
 
         self.running = True
 
-    def death_player(self):
+    def _death_player(self):
         self.renderer.draw_death_screen()
-        self.new_game()
+        self._new_game()
 
-    def update(self, dt: float):
+    def _update(self, dt: float):
         self.player.update(dt, self.world)   
 
         for bullet in self.world.bullets[:]:
@@ -73,21 +74,38 @@ class Game:
                     self.world.items.remove(item)
 
         if self.player.hp <= 0:
-            self.death_player()
+            self._death_player()
 
-    def draw(self, cam_x, cam_y, dt):
+    def _draw(self, cam_x, cam_y, dt):
         current_weapon = self.player.inventory.get_current()
         if hasattr(current_weapon, 'is_firing') and current_weapon.is_firing:
             self.camera.add_shake(3.0) 
 
         self.renderer.draw(cam_x, cam_y)
 
-    def run(self):
+    def run_game(self):
+        self._new_game()
+
         while self.running:
             dt = min(0.05, self.clock.tick(cfg.FPS) / 1000.0)
 
             cam_x, cam_y = self.camera.get_offset(self.player.rect, dt)
             
-            self.handler.process_events(self, cam_x, cam_y)
-            self.update(dt)
-            self.draw(cam_x, cam_y, dt)
+            self.handler.game_process_events(self, cam_x, cam_y)
+            self._update(dt)
+            self._draw(cam_x, cam_y, dt)
+
+    def run_menu(self):
+        while self.running:
+            new_state = self.handler.menu_process_events(self)
+
+            if new_state == cfg.START_GAME_BUTTON:
+                self.run_game()
+                return
+            elif new_state == cfg.SETTINGS_BUTTON:
+                pass
+
+            dt = min(0.05, self.clock.tick(cfg.FPS) / 1000.0)
+
+            self.menu.draw(dt)
+            pygame.display.flip()

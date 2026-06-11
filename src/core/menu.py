@@ -25,11 +25,11 @@ class MainMenu:
         self.scanline_y = 0
         self.selected_index = 0
 
-    def draw(self):
+    def draw(self, dt):
         self.screen.fill(cfg.COLOR_BG)
 
         self._draw_grid()
-        self._draw_scannig_line()
+        self._draw_scannig_line(dt)
         self._draw_title()
         self._draw_buttons()
 
@@ -80,8 +80,8 @@ class MainMenu:
         for y in range(0, self.height, 40):
             pygame.draw.line(self.screen, (15, 22, 33), (0, y), (self.width, y), 1)
 
-    def _draw_scannig_line(self):
-        self.scanline_y = (self.scanline_y + 2) % self.height
+    def _draw_scannig_line(self, dt):
+        self.scanline_y = (self.scanline_y + 250 * dt) % self.height
         pygame.draw.line(self.screen, (18, 32, 50), (0, self.scanline_y), (self.width, self.scanline_y), 1)
 
     def _draw_title(self):
