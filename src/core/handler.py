@@ -43,7 +43,7 @@ class Handler:
 
             if event.type == pygame.KEYDOWN:
                 if event.key in (pygame.K_UP, pygame.K_w, pygame.K_DOWN, pygame.K_s):
-                    game.menu.update_selection_by_keyboard()
+                    game.menu.update_selection_by_keyboard(event)
                 elif event.key in (pygame.K_RETURN, pygame.K_SPACE):
                     return game.menu.handle_space()
 
