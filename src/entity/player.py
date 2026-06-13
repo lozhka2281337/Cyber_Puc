@@ -17,8 +17,7 @@ class Player:
 
         self.inventory = Inventory()
 
-        # self.anim = Animation("assets/main-Sheet.png", columns=6, speed=0.07, scale=1.5)
-        self.anim = Animation("assets/Boss_skipop.png", columns=1, speed=0.07, scale=0.8)
+        self.anim = Animation("assets/main-Sheet.png", columns=6, speed=0.07, scale=1.5)
         self.flip_x = True 
 
         self.invulnerable_timer = 0 # таймер для щита бессмертия, появляющийся после получения урона
