@@ -17,10 +17,9 @@ import config as cfg
 class Game:
     def __init__(self):
         pygame.init()
-        pygame.display.set_caption("Roguelike Prototype")
+        pygame.display.set_caption("CYBER_PUC: 2067")
 
         self.screen = pygame.display.set_mode((cfg.SCREEN_WIDTH, cfg.SCREEN_HEIGHT))
-        self.FONT = pygame.font.SysFont("Arial", 32, bold = True)
         self.clock = pygame.time.Clock()
 
         self.menu = MainMenu(self.screen)
@@ -32,17 +31,18 @@ class Game:
         self.dungeon_generator.generate_dungeon()
 
         player_x, player_y = self.dungeon_generator.get_start_coord()
-
-        self.cyber_core = CyberCore(player_x, player_y)
+        core_x, core_y = self.dungeon_generator.get_cyber_core_coord(player_x, player_y)
+        
+        self.cyber_core = CyberCore(core_x, core_y)
         self.player = Player(player_x, player_y)
         self.renderer = Renderer(self.screen, self.player, self.cyber_core, self.world)
-        self.handler = Handler(self.player, self.world)
+        self.handler = Handler(self.player, self.cyber_core, self.world)
         self.camera = Camera(cfg.SCREEN_WIDTH, cfg.SCREEN_HEIGHT)
         self.spawner = Spawner(self.world, self.dungeon_generator, self.player)
         
         self.spawner.spawn_initial()  
-
-        self.running = True
+        
+        self.running = True 
 
     def _death_player(self):
         self.renderer.draw_death_screen()
@@ -87,8 +87,6 @@ class Game:
         self.renderer.draw(cam_x, cam_y)
 
     def run_game(self):
-        self._new_game()
-
         while self.running:
             dt = min(0.05, self.clock.tick(cfg.FPS) / 1000.0)
 

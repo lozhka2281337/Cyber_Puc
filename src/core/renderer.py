@@ -54,9 +54,9 @@ class Renderer:
 
     def _draw_hp(self):
         """Рисуем столько спрайтов HP, сколько здоровья у игрока"""
-        margin_x = 10  # отступ слева
-        margin_y = 10  # отступ сверху
-        spacing = 5  # расстояние между иконками
+        margin_x = 10  
+        margin_y = 10 
+        spacing = 5  
 
         for i in range(self.player.hp):
             x = margin_x + i * (self.hp_width + spacing)
@@ -68,14 +68,14 @@ class Renderer:
         self.screen.fill((0, 0, 0))
 
         death_msg = self.FONT.render("GAME OVER", True, (255, 255, 255))
-        self.screen.blit(death_msg, (cfg.SCREEN_WIDTH // 2 - 100, cfg.SCREEN_HEIGHT // 2))
+        self.screen.blit(death_msg, (cfg.SCREEN_WIDTH // 2 - 100, cfg.SCREEN_HEIGHT // 2 - 300))
         pygame.display.flip()
 
         pygame.time.wait(3000)
 
     def _draw_weapon_hud(self):
-        start_x = cfg.SCREEN_WIDTH - 220
-        start_y = cfg.SCREEN_HEIGHT - 80
+        start_x = cfg.SCREEN_WIDTH * 0.90
+        start_y = cfg.SCREEN_HEIGHT * 0.75
 
         for i in range(len(self.player.inventory.weapons)):
             weapon = self.player.inventory.weapons[i]
@@ -90,10 +90,10 @@ class Renderer:
                 text_surf.set_alpha(150)
             self.screen.blit(text_surf, (start_x, start_y + offset_y))
 
-    def _draw_weapon(self, camera_x, camera_y):
+    def _draw_weapon(self, cam_x, cam_y):
         weapon = self.player.inventory.get_current()
         if hasattr(weapon, 'draw'):
-            weapon.draw(self.screen, camera_x, camera_y, self.player.rect, self.walls)
+            weapon.draw(self.screen, cam_x, cam_y, self.player.rect, self.walls)
 
     def _draw_ping_interface(self):
         font = pygame.font.SysFont(None, 24)
@@ -120,37 +120,37 @@ class Renderer:
             
         return mask
 
-    def draw(self, camera_x, camera_y):
+    def draw(self, cam_x, cam_y):
         """ карта """
         self.screen.fill(cfg.FLOOR_COLOR)
-        self.screen.blit(self.map_surface, (-camera_x, -camera_y))
+        self.screen.blit(self.map_surface, (-cam_x, -cam_y))
 
         """ атака оружия игрока """
-        self._draw_weapon(camera_x, camera_y)
+        self._draw_weapon(cam_x, cam_y)
 
         """ ентити """
         for item in self.items:
-            item.draw(self.screen, camera_x, camera_y)
+            item.draw(self.screen, cam_x, cam_y)
 
         for bullet in self.bullets:
-            bullet.draw(self.screen, camera_x, camera_y)
+            bullet.draw(self.screen, cam_x, cam_y)
 
         for grenade in self.grenades:
-            grenade.draw(self.screen, camera_x, camera_y)
+            grenade.draw(self.screen, cam_x, cam_y)
+
+        self.cyber_core.draw(self.screen, cam_x, cam_y)
+        self.player.draw(self.screen, cam_x, cam_y)
 
         for enemy in self.enemies:
             if enemy.visible_timer <= 0:
-                enemy.draw(self.screen, camera_x, camera_y)
-
-        self.cyber_core.draw(self.screen, camera_x, camera_y)
-        self.player.draw(self.screen, camera_x, camera_y)
+                enemy.draw(self.screen, cam_x, cam_y)
 
         for effect in self.effects:
-            effect.draw(self.screen, camera_x, camera_y)
+            effect.draw(self.screen, cam_x, cam_y)
 
         if self.world.mod == cfg.DARK_MOD:
             for ping in self.pings:
-                ping.draw(self.screen, camera_x, camera_y)
+                ping.draw(self.screen, cam_x, cam_y)
 
             # рисуем темноту вокруг игрока
             self.screen.blit(self.darkness_mask, (0, 0))
@@ -158,7 +158,17 @@ class Renderer:
             # рисуем врагов, которые попали под пинг
             for enemy in self.enemies:
                 if enemy.visible_timer > 0.0:
-                    enemy.draw(self.screen, camera_x, camera_y)
+                    enemy.draw(self.screen, cam_x, cam_y)
+
+            if self.cyber_core.can_interact(self.player.rect):
+                # Вычисляем позицию чуть выше ядра на экране (с учетом камеры)
+                text_x = self.cyber_core.rect.centerx - cam_x
+                text_y = self.cyber_core.rect.y - cam_y - 20
+                
+                # Рендерим текст (используйте ваш info_font или menu_font)
+                hint_surf = cfg.menu_font.render("[ E ] ПОДКЛЮЧИТЬСЯ", True, (255, 255, 255))
+                hint_rect = hint_surf.get_rect(center=(text_x, text_y))
+                self.screen.blit(hint_surf, hint_rect)
 
             self._draw_ping_interface()
 

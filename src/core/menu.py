@@ -11,11 +11,6 @@ class MainMenu:
         self.width = screen.get_width()
         self.height = screen.get_height()
 
-        # шрифты
-        self.title_font = pygame.font.SysFont("Courier New", 50, bold=True)
-        self.menu_font = pygame.font.SysFont("Courier New", 24, bold=True)
-        self.info_font = pygame.font.SysFont("Courier New", 20)
-
         self.title_text = cfg.GAME_TITLE
         self.menu_options = [cfg.START_GAME_BUTTON, cfg.SETTINGS_BUTTON, cfg.EXIT_BUTTON]
         self.current_message = ""  
@@ -72,7 +67,7 @@ class MainMenu:
     def _create_buttons(self):
         for i in range(len(self.menu_options)):
             btn_w, btn_h = 340, 50
-            rect = pygame.Rect(self.width//2 - btn_w//2, self.height//2 - 30 + i * 70, btn_w, btn_h)
+            rect = pygame.Rect(self.width//2 - btn_w//2, self.height//2 - self.height*0.2 + i * 70, btn_w, btn_h)
             self.button_rects.append(rect)
 
     def _draw_grid(self):
@@ -88,19 +83,19 @@ class MainMenu:
     def _draw_title(self):
         off_x, off_y = 0, 0
 
-        if random.random() < 0.05:  # 5% шанс искажения каждый кадр
+        if random.random() < 0.05:  
             off_x = random.randint(-3, 3)
             off_y = random.randint(-1, 1)
 
-            glitch_surf = self.title_font.render(self.title_text, True, cfg.COLOR_NEON_RED)
+            glitch_surf = cfg.title_font.render(self.title_text, True, cfg.COLOR_NEON_RED)
             self.screen.blit(glitch_surf, glitch_surf.get_rect(center=(self.width//2 + off_x * 2, self.height//5 + off_y)))
 
-        title_surf = self.title_font.render(self.title_text, True, cfg.COLOR_NEON_BLUE)
+        title_surf = cfg.title_font.render(self.title_text, True, cfg.COLOR_NEON_BLUE)
         self.screen.blit(title_surf, title_surf.get_rect(center=(self.width//2 + off_x, self.height//5 + off_y)))
         pygame.draw.line(self.screen, cfg.COLOR_NEON_BLUE, (self.width//4, self.height//5 + 40), (3 * self.width//4, self.height//5 + 40), 2)
 
-        footer_surf = self.info_font.render("Made by team Бурмалда", True, (80, 100, 120))
-        self.screen.blit(footer_surf, footer_surf.get_rect(center=(self.width//2, self.height - 40)))
+        footer_surf = cfg.info_font.render("Made by team Бурмалда", True, (80, 100, 120))
+        self.screen.blit(footer_surf, footer_surf.get_rect(center=(self.width//2, self.height - self.height*0.1)))
 
     def _draw_buttons(self):
         for i, opt in enumerate(self.menu_options):
@@ -118,7 +113,7 @@ class MainMenu:
             pygame.draw.rect(self.screen, (13, 18, 26), rect)
             pygame.draw.rect(self.screen, border_color, rect, 2)
 
-            # Рисуем хакерские«уголки для выделенной кнопки
+            # Рисуем хакерские уголки для выделенной кнопки
             if is_selected:
                 pygame.draw.rect(self.screen, cfg.WHITE, (rect.x - 3, rect.y - 3, 8, 3))
                 pygame.draw.rect(self.screen, cfg.WHITE, (rect.x - 3, rect.y - 3, 3, 8))
@@ -126,7 +121,7 @@ class MainMenu:
             else:
                 display_text = opt
 
-            text_surf = self.menu_font.render(display_text, True, text_color)
+            text_surf = cfg.menu_font.render(display_text, True, text_color)
             self.screen.blit(text_surf, text_surf.get_rect(center=rect.center))
 
             

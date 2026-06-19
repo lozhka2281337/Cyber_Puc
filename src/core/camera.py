@@ -18,7 +18,7 @@ class Camera:
 
         # Центрируем камеру на цели
         cam_x = target_rect.x + (target_rect.width / 2) - (self.width / 2)
-        cam_y = target_rect.y + (target_rect.height / 2) - (self.height / 2)
+        cam_y = target_rect.y + (target_rect.height / 2) - (self.height / 2) 
 
         # Применяем тряску
         if self.shake_intensity > 0:

@@ -2,6 +2,8 @@ import pygame
 import math
 import random
 
+import config as cfg
+
 # красивые частицы для ядра 
 class Particle:
     def __init__(self, x, y, dx, dy, live_time):
@@ -51,6 +53,16 @@ class CyberCore:
         self._draw_pulsating_frame(surface, cam_x, cam_y, pulse)
         self._draw_core_center(surface, cam_x, cam_y, pulse)
         self._draw_orbital_dot(surface, cam_x, cam_y)
+
+    def core_activate(self, world, player):
+        if self.can_interact(player):
+            world.mod = cfg.NORMAL_MOD
+            
+
+    def can_interact(self, player) -> bool:
+        # Раздуваем хитбокс ядра на 40 пикселей для зоны взаимодействия
+        interaction_zone = self.rect.inflate(40, 40)
+        return interaction_zone.colliderect(player)
 
     def _spawn_particles(self):
         if random.random() < 0.2:

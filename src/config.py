@@ -1,7 +1,7 @@
 import pygame
 
 """ общие настройки """
-SCREEN_WIDTH, SCREEN_HEIGHT = 1280, 720 
+SCREEN_WIDTH, SCREEN_HEIGHT = 1920, 1080
 
 FPS = 60
 BLACK = (20, 20, 25)
@@ -13,6 +13,11 @@ MAP_HEIGHT = 60
 
 SPAWN_ENEMY_EVENT = pygame.event.custom_type()
 SPAWN_ENEMY_TIME = 1800
+
+""" шрифты """
+title_font = pygame.font.SysFont("Courier New", 50, bold=True)
+menu_font = pygame.font.SysFont("Courier New", 24, bold=True)
+info_font = pygame.font.SysFont("Courier New", 20)
 
 
 """ режимы """
@@ -127,7 +132,7 @@ COLOR_NEON_BLUE = (0, 200, 255)
 COLOR_NEON_RED = (255, 50, 80)
 
 GAME_TITLE = "CYBER_PUK: 2067"
-START_GAME_BUTTON = "ЗАПУСТИТЬ СЕРВЕР"
-SETTINGS_BUTTON = "НАСТРОЙКИ СЕТИ"
-EXIT_BUTTON = "ПОКИНУТЬ СЕРВЕР"
+START_GAME_BUTTON = "НАЧАТЬ"
+SETTINGS_BUTTON = "НАСТРОЙКИ"
+EXIT_BUTTON = "ВЫЙТИ"
 DEFAULT_MENU_BUTTON = "МЕНЮ"

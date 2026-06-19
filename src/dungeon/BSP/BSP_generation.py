@@ -30,11 +30,32 @@ class BSPGeneration:
                 )
                 self.world.rooms.append(pixel_rect)
 
-    def get_start_coord(self):
+    def get_start_coord(self) -> list:
         for y in range(cfg.MAP_HEIGHT):
                 for x in range(cfg.MAP_WIDTH):
                     if self.world.matrix[y][x] == 0:
                         return [x*cfg.TILE_SIZE, y*cfg.TILE_SIZE]
+                    
+    def get_cyber_core_coord(self, player_x, player_y) -> list:
+        best_room = None
+        max_distance_sq = -1
+
+        # Перебираем все сгенерированные BSP-деревья, где есть комнаты
+        for leaf in self.leafs:
+            if leaf.room is not None:
+                room_center_x = (leaf.room.x + leaf.room.width // 2) * cfg.TILE_SIZE
+                room_center_y = (leaf.room.y + leaf.room.height // 2) * cfg.TILE_SIZE
+
+                dx = room_center_x - player_x
+                dy = room_center_y - player_y
+                distance_sq = dx**2 + dy**2
+
+                # Ищем самую далекую комнату
+                if distance_sq > max_distance_sq:
+                    max_distance_sq = distance_sq
+                    best_room = (room_center_x, room_center_y)
+        
+        return list(best_room)
 
     def get_random_floor_coords(self, count):
         floors = []

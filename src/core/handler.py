@@ -1,16 +1,12 @@
 import pygame
 
-class Handler:
-    def __init__(self, player, world):
-        self.player = player
+import config as cfg
 
+class Handler:
+    def __init__(self, player, cyber_core, world):
+        self.player = player
+        self.cyber_core = cyber_core
         self.world = world
-        self.walls = world.walls
-        self.bullets = world.bullets
-        self.enemies = world.enemies
-        self.effects = world.effects
-        self.grenades = world.grenades
-        self.pings = world.pings
 
     def game_process_events(self, game, camera_x: float, camera_y: float):
         for event in pygame.event.get():
@@ -31,6 +27,11 @@ class Handler:
                     self.player.switch_weapon(forward=True)
                 if event.button == 1: 
                     self.player.shot(camera_x, camera_y, game.world)        
+            
+            if self.world.mod == cfg.DARK_MOD:
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_e:
+                        self.cyber_core.core_activate(self.world, self.player)
 
     def menu_process_events(self, game) -> str | None:
         for event in pygame.event.get():
