@@ -131,3 +131,11 @@ START_GAME_BUTTON = "ЗАПУСТИТЬ СЕРВЕР"
 SETTINGS_BUTTON = "НАСТРОЙКИ СЕТИ"
 EXIT_BUTTON = "ПОКИНУТЬ СЕРВЕР"
 DEFAULT_MENU_BUTTON = "МЕНЮ"
+
+
+""" инвентарь """
+INVENTORY_ROWS = 4
+INVENTORY_COLS = 4
+INVENTORY_CELL_SIZE = 70
+INVENTORY_BORDER_COLOR = (60, 70, 90)
+INVENTORY_BG_COLOR = (25, 28, 35)

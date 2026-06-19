@@ -16,21 +16,28 @@ class Handler:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 game.running = False
-            
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_ESCAPE:
-                    game.running = False
-                if event.key == pygame.K_q:
-                    self.player.ping(self.world)
 
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                # обработка колесика мышки (переключает оружие)
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_TAB:
+                    game.toggle_inventory()
+
+                if event.key == pygame.K_ESCAPE:
+                    if game.player.inventory.is_open:
+                        game.toggle_inventory()
+                    else:
+                        game.running = False
+
+                if not game.player.inventory.is_open:
+                    if event.key == pygame.K_q:
+                        self.player.ping(self.world)
+
+            if event.type == pygame.MOUSEBUTTONDOWN and not game.player.inventory.is_open:
                 if event.button == 4:
                     self.player.switch_weapon(forward=False)
                 if event.button == 5:
                     self.player.switch_weapon(forward=True)
-                if event.button == 1: 
-                    self.player.shot(camera_x, camera_y, game.world)        
+                if event.button == 1:
+                    self.player.shot(camera_x, camera_y, game.world)
 
     def menu_process_events(self, game) -> str | None:
         for event in pygame.event.get():
@@ -49,7 +56,6 @@ class Handler:
 
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                return game.menu.handle_left_mouse_button()
-        
-        return None
 
+        return None
 

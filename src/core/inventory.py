@@ -14,6 +14,9 @@ class Inventory:
             GrenadeLauncher("Zip-Bomb", 20, 1, 1000, throw_speed=400, blast_radius=70, fuse_time=1000, max_range=350)
         ]
         self.current_idx = 0
+        self.is_open = False
+
+
 
     def get_current(self):
         return self.weapons[self.current_idx]
@@ -27,3 +30,8 @@ class Inventory:
     def update_all(self):
         for weapon in self.weapons:
             weapon.update()
+
+
+    def toggle(self):
+        """Переключение состояния инвенторя"""
+        self.is_open = not self.is_open
