@@ -25,13 +25,14 @@ class Handler:
                 if event.button == 5:
                     self.player.switch_weapon(forward=True)
                 if event.button == 1:
-                    self.player.shot(camera_x, camera_y, game.world)
+                    self.player.shot(camera_x, camera_y, self.world)
 
             if self.world.mod == cfg.DARK_MOD:
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_e:
                         was_dark = self.world.mod == cfg.DARK_MOD
-                        self.cyber_core.core_activate(self.world, self.player)
+                        if self.cyber_core.core_activate(self.world, self.player):
+                            game.set_normal_mod()
 
                         if was_dark and self.world.core_activated and not self.world.boss_spawned:
                             game.spawn_boss_in_start_room()

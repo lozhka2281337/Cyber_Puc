@@ -55,10 +55,8 @@ class CyberCore:
         self._draw_pulsating_frame(surface, cam_x, cam_y, pulse)
         self._draw_core_center(surface, cam_x, cam_y, pulse)
 
-    def core_activate(self, world, player):
-        if self.can_interact(player):
-            world.mod = cfg.NORMAL_MOD
-            world.core_activated = True
+    def core_activate(self, world, player) -> bool:
+        return self.can_interact(player)
             
     def can_interact(self, player) -> bool:
         # Раздуваем хитбокс ядра на 40 пикселей для зоны взаимодействия

@@ -12,6 +12,7 @@ from core.handler import Handler
 from core.camera import Camera
 from core.spawner import Spawner
 from core.menu import MainMenu
+from core.audio_manager import AudioManager
 
 import config as cfg
 
@@ -38,24 +39,36 @@ class Game:
             self._draw(cam_x, cam_y)
 
     def run_menu(self):
-        while self.running:
-            new_state = self.handler.menu_process_events(self)
+        self.audio_manager.play_bgm(cfg.MENU_MUSIC)
 
-            if new_state == cfg.START_GAME_BUTTON:
+        while self.running:
+            button_clicked = self.handler.menu_process_events(self)
+
+            if button_clicked == cfg.START_GAME_BUTTON:
                 self.run_game()
                 return
-            elif new_state == cfg.SETTINGS_BUTTON:
-                pass
-            elif new_state == cfg.EXIT_BUTTON:
+            elif button_clicked == cfg.SETTINGS_BUTTON:
+                self.menu.state_change(cfg.SETTINGS_BUTTON)
+            elif button_clicked == cfg.EXIT_BUTTON:
                 pygame.quit()
                 return
+            elif button_clicked == cfg.VOLUME_BUTTON:
+                pass
+            elif button_clicked == cfg.BACK_BUTTON:
+                self.menu.state_change(cfg.BACK_BUTTON)
 
             dt = min(0.05, self.clock.tick(cfg.FPS) / 1000.0)
 
             self.menu.draw(dt)
             pygame.display.flip()
 
-    
+    def set_normal_mod(self):
+        self.world.mod = cfg.NORMAL_MOD
+        self.world.core_activated = True
+
+        self.audio_manager.play_bgm(cfg.ACTION_MUSIC)
+
+
     def spawn_boss_in_start_room(self):
         if self.world.boss_spawned:
             return
@@ -88,6 +101,7 @@ class Game:
         self.handler = Handler(self.player, self.cyber_core, self.world)
         self.camera = Camera(cfg.SCREEN_WIDTH, cfg.SCREEN_HEIGHT)
         self.transition_manager = TransitionManager(self.screen, self.camera)
+        self.audio_manager = AudioManager()
         self.spawner = Spawner(self.world, self.dungeon_generator, self.player)
 
         self.spawner.spawn_initial()

@@ -1,8 +1,12 @@
 import pygame
 import random
+import enum
 
 import config as cfg
 
+class MenuStates(enum.Enum):
+    MAIN = enum.auto()
+    SETTINGS = enum.auto()
 
 class MainMenu:
     def __init__(self, screen):
@@ -11,8 +15,10 @@ class MainMenu:
         self.width = screen.get_width()
         self.height = screen.get_height()
 
+        self.state = MenuStates.MAIN
         self.title_text = cfg.GAME_TITLE
         self.menu_options = [cfg.START_GAME_BUTTON, cfg.SETTINGS_BUTTON, cfg.EXIT_BUTTON]
+        self.settings_options = [cfg.VOLUME_BUTTON, cfg.BACK_BUTTON]
         self.current_message = ""  
 
         self.button_rects = []
@@ -20,6 +26,7 @@ class MainMenu:
 
         self.scanline_y = 0         # координата y скан линии
         self.selected_index = 0     # индекс выбранной кнопки
+        self.volume = 100
 
     def draw(self, dt):
         self.screen.fill(cfg.COLOR_BG)
@@ -30,12 +37,19 @@ class MainMenu:
         self._draw_buttons()
 
     def handle_space(self) -> str:
-        if self.selected_index == 0:
-            return cfg.START_GAME_BUTTON
-        elif self.selected_index == 1:
-            return cfg.SETTINGS_BUTTON
-        elif self.selected_index == 2:
-            return cfg.EXIT_BUTTON
+        if self.state == MenuStates.MAIN:
+            if self.selected_index == 0:
+                return cfg.START_GAME_BUTTON
+            elif self.selected_index == 1:
+                return cfg.SETTINGS_BUTTON
+            elif self.selected_index == 2:
+                return cfg.EXIT_BUTTON
+        elif self.state == MenuStates.SETTINGS:
+            if self.selected_index == 0:
+                # volume
+                pass
+            elif self.selected_index == 1:
+                return cfg.BACK_BUTTON
 
         return cfg.DEFAULT_MENU_BUTTON
 
@@ -64,8 +78,19 @@ class MainMenu:
 
         self.selected_index = self.selected_index % len(self.menu_options)
 
+    def state_change(self, button):
+        if button == cfg.BACK_BUTTON:
+            self.state = MenuStates.MAIN
+        elif button == cfg.SETTINGS_BUTTON:
+            self.state = MenuStates.SETTINGS
+
+        self._create_buttons()
+
     def _create_buttons(self):
-        for i in range(len(self.menu_options)):
+        options = self._get_options()
+        self.button_rects = []
+
+        for i in range(len(options)):
             btn_w, btn_h = 340, 50
             rect = pygame.Rect(self.width//2 - btn_w//2, self.height//2 - self.height*0.2 + i * 70, btn_w, btn_h)
             self.button_rects.append(rect)
@@ -97,8 +122,14 @@ class MainMenu:
         footer_surf = cfg.info_font.render("Made by team Бурмалда", True, (80, 100, 120))
         self.screen.blit(footer_surf, footer_surf.get_rect(center=(self.width//2, self.height - self.height*0.1)))
 
+    def _get_options(self):
+        if self.state == MenuStates.MAIN: return self.menu_options
+        elif self.state == MenuStates.SETTINGS: return self.settings_options
+
     def _draw_buttons(self):
-        for i, opt in enumerate(self.menu_options):
+        options = self._get_options()
+
+        for i, opt in enumerate(options):
             is_selected = (i == self.selected_index)
             rect = self.button_rects[i]
 

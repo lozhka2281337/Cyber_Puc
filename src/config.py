@@ -22,6 +22,11 @@ arial_font = pygame.font.SysFont("Arial", 32, bold=True)
 none_font = pygame.font.SysFont(None, 32, bold=True)
 
 
+""" музыка """
+MENU_MUSIC = "music/Crowbar_-_To_Touch_The_Hand_Of_God_(SkySound.cc).mp3"
+ACTION_MUSIC = "music/doom_02.Rip_and_Tear.mp3"
+
+
 """ режимы """
 NORMAL_MOD = "normal"
 DARK_MOD = "stels"
@@ -29,7 +34,7 @@ DARK_MOD = "stels"
 
 """ карта """
 TILE_SIZE = 40
- 
+
 FLOOR_COLOR = (0, 0, 0)
 
 
@@ -37,8 +42,8 @@ FLOOR_COLOR = (0, 0, 0)
 DARKNESS_DEGREE = 240
 DARKNESS_RADIUS = 250
 
-""" BSP генерация """
 
+""" BSP генерация """
 MIN_LEAF_SIZE = 20
 MAX_LEAF_SIZE = 30
 
@@ -134,3 +139,5 @@ START_GAME_BUTTON = "НАЧАТЬ"
 SETTINGS_BUTTON = "НАСТРОЙКИ"
 EXIT_BUTTON = "ВЫЙТИ"
 DEFAULT_MENU_BUTTON = "МЕНЮ"
+VOLUME_BUTTON = "ГРОМКОСТЬ"
+BACK_BUTTON = "НАЗАД"
