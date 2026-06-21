@@ -188,7 +188,7 @@ class Game:
         if self.paused:
             self.screen.blit(self.pause_overlay, (0, 0))
 
-            text = cfg.menu_font.render("Пауза (B - Продолжить!)", True, cfg.COLOR_NEON_BLUE)
+            text = cfg.menu_font.render("Пауза (esc - Продолжить!)", True, cfg.COLOR_NEON_BLUE)
             text_rect = text.get_rect(center = (cfg.SCREEN_WIDTH // 2, cfg.SCREEN_HEIGHT // 2))
             self.screen.blit(text, text_rect)
 

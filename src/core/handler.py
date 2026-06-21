@@ -25,7 +25,7 @@ class Handler:
 
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
-                    game.running = False
+                    game.paused = not game.paused
                 if event.key == pygame.K_q:
                     self.player.ping(self.world)
 
@@ -40,9 +40,6 @@ class Handler:
                     self.player.inventory.set_weapon(3)
                 if event.key == pygame.K_5:
                     self.player.inventory.set_weapon(4)
-
-                if event.key == pygame.K_b:
-                    game.paused = not game.paused
 
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 4:
