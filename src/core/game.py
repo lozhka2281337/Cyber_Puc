@@ -13,6 +13,7 @@ from core.camera import Camera
 from core.spawner import Spawner
 from core.menu import MainMenu
 from core.audio_manager import AudioManager
+from core.intro import TerminalIntro
 
 import config as cfg
 
@@ -27,6 +28,21 @@ class Game:
 
         self.menu = MainMenu(self.screen)
         self._new_game()
+
+    def run_intro(self):
+        self.audio_manager.play_bgm(cfg.MENU_MUSIC)
+
+        while self.running:
+            self.handler.intro_process_events(self)
+
+            if self.terminal_intro.update():
+                break
+
+            self.terminal_intro.draw()
+
+        self.world.mod = cfg.DARK_MOD 
+        self.running = True
+        self.run_game()
 
     def run_game(self):
         while self.running:
@@ -45,7 +61,7 @@ class Game:
             button_clicked = self.handler.menu_process_events(self)
 
             if button_clicked == cfg.START_GAME_BUTTON:
-                self.run_game()
+                self.run_intro()
                 return
             elif button_clicked == cfg.SETTINGS_BUTTON:
                 self.menu.state_change(cfg.SETTINGS_BUTTON)
@@ -67,7 +83,6 @@ class Game:
         self.world.core_activated = True
 
         self.audio_manager.play_bgm(cfg.ACTION_MUSIC)
-
 
     def spawn_boss_in_start_room(self):
         if self.world.boss_spawned:
@@ -96,6 +111,7 @@ class Game:
         self.world.player = self.player
         self.world.start_room = self._find_room_by_point(player_x, player_y)
 
+        self.terminal_intro = TerminalIntro(self.screen)
         self.world_renderer = WorldRenderer(self.screen, self.world, self.player, self.cyber_core)
         self.dark_renderer = DarkRenderer(self.screen, self.world, self.player, self.cyber_core)
         self.handler = Handler(self.player, self.cyber_core, self.world)

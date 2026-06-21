@@ -8,6 +8,16 @@ class Handler:
         self.cyber_core = cyber_core
         self.world = world
 
+    def intro_process_events(self, game):
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                exit(0)
+
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    game.running = False
+
     def game_process_events(self, game, transition_manager, camera_x: float, camera_y: float):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:

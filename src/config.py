@@ -18,6 +18,7 @@ SPAWN_ENEMY_TIME = 1800
 title_font = pygame.font.SysFont("Courier New", 50, bold=True)
 menu_font = pygame.font.SysFont("Courier New", 24, bold=True)
 info_font = pygame.font.SysFont("Courier New", 20)
+font_terminal = pygame.font.SysFont("Courier New", 18, bold=True)
 arial_font = pygame.font.SysFont("Arial", 32, bold=True)
 none_font = pygame.font.SysFont(None, 32, bold=True)
 
@@ -27,9 +28,10 @@ MENU_MUSIC = "music/Crowbar_-_To_Touch_The_Hand_Of_God_(SkySound.cc).mp3"
 ACTION_MUSIC = "music/doom_02.Rip_and_Tear.mp3"
 
 
-""" режимы """
+""" состояния игры """
 NORMAL_MOD = "normal"
 DARK_MOD = "stels"
+INTRO_MOD = "intro"
 
 
 """ карта """
@@ -130,7 +132,7 @@ INITIAL_ENEMY_COUNT = 15    # Точное количество врагов п�
 """ меню """
 COLOR_BG = (10, 12, 18)
 COLOR_TEXT_MUTED = (70, 80, 95)
-COLOR_NEON_GREEN = (0, 255, 150)
+COLOR_NEON_GREEN = (0, 255, 120)
 COLOR_NEON_BLUE = (0, 200, 255)
 COLOR_NEON_RED = (255, 50, 80)
 

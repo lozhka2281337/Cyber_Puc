@@ -65,8 +65,11 @@ class BSPGeneration:
                         queue.append([nx, ny, d+1])
 
         center_x, center_y = self._get_center_coord_by_room(best_x, best_y)
+        
+        core_x = center_x * cfg.TILE_SIZE + cfg.TILE_SIZE // 2
+        core_y = center_y * cfg.TILE_SIZE + cfg.TILE_SIZE // 2
 
-        return [center_x*cfg.TILE_SIZE, center_y*cfg.TILE_SIZE]
+        return [core_x, core_y]
 
     def get_random_floor_coords(self, count):
         floors = []
