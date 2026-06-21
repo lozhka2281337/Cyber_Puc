@@ -414,7 +414,6 @@ class Boss(Enemy):
             if dist_to_center > 20:
                 direction = (center - self.pos).normalize()
                 self.move(world.walls, dt, direction)
-                return
             else:
                 self.summon_at_center = True
                 self.is_invulnerable = True
