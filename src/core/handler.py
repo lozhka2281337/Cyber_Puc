@@ -8,8 +8,8 @@ class Handler:
         self.cyber_core = cyber_core
         self.world = world
 
-    def intro_process_events(self, game):
-        for event in pygame.event.get():
+    def intro_process_events(self, game, events):
+        for event in events:
             if event.type == pygame.QUIT:
                 pygame.quit()
                 exit(0)
@@ -18,8 +18,8 @@ class Handler:
                 if event.key == pygame.K_ESCAPE:
                     game.running = False
 
-    def game_process_events(self, game, transition_manager, camera_x: float, camera_y: float):
-        for event in pygame.event.get():
+    def game_process_events(self, game, transition_manager, camera_x: float, camera_y: float, events):
+        for event in events:
             if event.type == pygame.QUIT:
                 game.running = False
 
@@ -60,8 +60,8 @@ class Handler:
                             game.spawn_boss_in_start_room()
                             transition_manager.trigger_transition()
 
-    def menu_process_events(self, game) -> str | None:
-        for event in pygame.event.get():
+    def menu_process_events(self, game, events) -> str | None:
+        for event in events:
             if event.type == pygame.QUIT:
                 game.running = False
 

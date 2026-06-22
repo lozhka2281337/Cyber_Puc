@@ -12,6 +12,7 @@ from core.handler import Handler
 from core.camera import Camera
 from core.spawner import Spawner
 from core.menu import MainMenu
+from core.pause_menu import PauseMenu
 from core.audio_manager import AudioManager
 from core.intro import TerminalIntro
 
@@ -33,34 +34,80 @@ class Game:
         self.audio_manager.play_bgm(cfg.MENU_MUSIC)
 
         while self.running:
-            self.handler.intro_process_events(self)
+            events = pygame.event.get()
+            self.handler.intro_process_events(self, events)
 
             if self.terminal_intro.update():
                 break
 
             self.terminal_intro.draw()
 
-        self.world.mod = cfg.DARK_MOD 
+        self.world.mod = cfg.DARK_MOD
         self.running = True
         self.run_game()
+
 
     def run_game(self):
         while self.running:
             dt = min(0.05, self.clock.tick(cfg.FPS) / 1000.0)
-
             cam_x, cam_y = self.camera.get_offset(self.player.rect)
+            events = pygame.event.get()
 
-            self.handler.game_process_events(self, self.transition_manager, cam_x, cam_y)
-            if not self.paused:
-                self._update(dt)
+            # ПАуза
+            if self.paused:
+                # 1. Рисуем мир
+                self.world_renderer.draw_world(cam_x, cam_y)
+                if self.world.mod == cfg.DARK_MOD:
+                    self.dark_renderer.draw(cam_x, cam_y)
+                self.world_renderer.draw_interface()
+                self.transition_manager.draw_flash()
 
+                # 2. Рисуем затемнение
+                self.screen.blit(self.pause_overlay, (0, 0))
+
+                # 3. Рисуем меню паузы
+                self.pause_menu.draw(dt)
+
+                # 4. Обновляем экран ТОЛЬКО ОДИН РАЗ
+                pygame.display.flip()
+
+                # Обработка событий меню паузы
+                for event in events:
+                    if event.type == pygame.QUIT:
+                        self.running = False
+                    if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+                        self.paused = False
+
+                    button = self.pause_menu.handle_event(event)
+                    if button == "ПРОДОЛЖИТЬ":
+                        self.paused = False
+                    elif button == cfg.SETTINGS_BUTTON:
+                        self.pause_menu.state_change(cfg.SETTINGS_BUTTON)
+                    elif button == cfg.VOLUME_BUTTON:
+                        self.audio_manager.set_bgm_volume(self.pause_menu.volume / 100)
+                    elif button == cfg.BACK_BUTTON:
+                        self.pause_menu.state_change(cfg.BACK_BUTTON)
+                    elif button == cfg.EXIT_BUTTON:
+                        pygame.quit()
+                        return
+                continue
+
+            # === ИГРА АКТИВНА ===
+            self.handler.game_process_events(self, self.transition_manager, cam_x, cam_y, events)
+            self._update(dt)
             self._draw(cam_x, cam_y)
+
+
+            # Обновляем экран ТОЛЬКО ОДИН РАЗ для обычной игры
+            pygame.display.flip()
+
 
     def run_menu(self):
         self.audio_manager.play_bgm(cfg.MENU_MUSIC)
 
         while self.running:
-            button_clicked = self.handler.menu_process_events(self)
+            events = pygame.event.get()
+            button_clicked = self.handler.menu_process_events(self, events)
 
             if button_clicked == cfg.START_GAME_BUTTON:
                 self.run_intro()
@@ -76,14 +123,12 @@ class Game:
                 self.menu.state_change(cfg.BACK_BUTTON)
 
             dt = min(0.05, self.clock.tick(cfg.FPS) / 1000.0)
-
             self.menu.draw(dt)
             pygame.display.flip()
 
     def set_normal_mod(self):
         self.world.mod = cfg.NORMAL_MOD
         self.world.core_activated = True
-
         self.audio_manager.play_bgm(cfg.ACTION_MUSIC)
 
     def spawn_boss_in_start_room(self):
@@ -130,6 +175,8 @@ class Game:
         self.pause_overlay = pygame.Surface((cfg.SCREEN_WIDTH, cfg.SCREEN_HEIGHT), pygame.SRCALPHA)
         self.pause_overlay.fill((0, 0, 0, 180))
 
+        self.pause_menu = PauseMenu(self.screen)
+
     def _find_room_by_point(self, x: int, y: int):
         for room in self.world.rooms:
             if room.collidepoint(x, y):
@@ -148,16 +195,12 @@ class Game:
 
         for bullet in self.world.bullets[:]:
             bullet.update(self.world, self.player, dt)
-
         for grenade in self.world.grenades[:]:
             grenade.update(self.world, self.camera, dt)
-
         for effect in self.world.effects[:]:
             effect.update(self.world.effects, dt)
-
         for enemy in self.world.enemies[:]:
             enemy.update(self.world, self.player, dt)
-
         for ping in self.world.pings[:]:
             ping.update(self.world, self.player, dt)
 
@@ -179,15 +222,10 @@ class Game:
             self.camera.add_shake(3.0)
 
         self.world_renderer.draw_world(cam_x, cam_y)
-        if self.world.mod == cfg.DARK_MOD: self.dark_renderer.draw(cam_x, cam_y)
+        if self.world.mod == cfg.DARK_MOD:
+            self.dark_renderer.draw(cam_x, cam_y)
         self.world_renderer.draw_interface()
         self.transition_manager.draw_flash()
 
         if self.paused:
             self.screen.blit(self.pause_overlay, (0, 0))
-
-            text = cfg.menu_font.render("Пауза (esc - Продолжить!)", True, cfg.COLOR_NEON_BLUE)
-            text_rect = text.get_rect(center = (cfg.SCREEN_WIDTH // 2, cfg.SCREEN_HEIGHT // 2))
-            self.screen.blit(text, text_rect)
-
-        pygame.display.flip()
