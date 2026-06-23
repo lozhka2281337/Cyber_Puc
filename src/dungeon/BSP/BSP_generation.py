@@ -19,17 +19,6 @@ class BSPGeneration:
         self._init_matrix()
         self._create_walls()
 
-    def _extract_rooms(self):
-        for leaf in self.leafs:
-            if leaf.room is not None:
-                pixel_rect = pygame.Rect(
-                    leaf.room.x * cfg.TILE_SIZE,
-                    leaf.room.y * cfg.TILE_SIZE,
-                    leaf.room.width * cfg.TILE_SIZE,
-                    leaf.room.height * cfg.TILE_SIZE
-                )
-                self.world.rooms.append(pixel_rect)
-
     def get_start_coord(self) -> list:
         for leaf in self.leafs:
             if leaf.room is not None:
@@ -40,7 +29,6 @@ class BSPGeneration:
 
     def get_cyber_core_coord(self, player_x, player_y) -> list:
         # поиск координат для ядра через BFS
-
         best_x = player_x // cfg.TILE_SIZE
         best_y = player_y // cfg.TILE_SIZE
         best_d = 0
@@ -82,6 +70,23 @@ class BSPGeneration:
         if len(floors) < count:
             return floors
         return random.sample(floors, count)
+    
+    def find_room_by_point(self, x: int, y: int):
+        for room in self.world.rooms:
+            if room.collidepoint(x, y):
+                return room
+        return self.world.rooms[0] if self.world.rooms else None
+
+    def _extract_rooms(self):
+        for leaf in self.leafs:
+            if leaf.room is not None:
+                pixel_rect = pygame.Rect(
+                    leaf.room.x * cfg.TILE_SIZE,
+                    leaf.room.y * cfg.TILE_SIZE,
+                    leaf.room.width * cfg.TILE_SIZE,
+                    leaf.room.height * cfg.TILE_SIZE
+                )
+                self.world.rooms.append(pixel_rect)
 
     def _generate_leafs(self):
         root = Leaf(0, 0, cfg.MAP_WIDTH, cfg.MAP_HEIGHT)

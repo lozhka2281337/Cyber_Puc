@@ -35,7 +35,7 @@ class Game:
 
         while self.running:
             events = pygame.event.get()
-            self.handler.intro_process_events(self, events)
+            self.handler.intro_process_events(events)
 
             if self.terminal_intro.update():
                 break
@@ -53,54 +53,11 @@ class Game:
         while self.running:
             dt = min(0.05, self.clock.tick(cfg.FPS) / 1000.0)
             cam_x, cam_y = self.camera.get_offset(self.player.rect)
-            events = pygame.event.get()
 
-            # ПАуза
-            if self.paused:
-                # 1. Рисуем мир
-                self.world_renderer.draw_world(cam_x, cam_y)
-                if self.world.mod == cfg.DARK_MOD:
-                    self.dark_renderer.draw(cam_x, cam_y)
-                self.world_renderer.draw_interface()
-                self.transition_manager.draw_flash()
-
-                # 2. Рисуем затемнение
-                self.screen.blit(self.pause_overlay, (0, 0))
-
-                # 3. Рисуем меню паузы
-                self.pause_menu.draw(dt)
-
-                # 4. Обновляем экран ТОЛЬКО ОДИН РАЗ
-                pygame.display.flip()
-
-                # Обработка событий меню паузы
-                for event in events:
-                    if event.type == pygame.QUIT:
-                        self.running = False
-                    if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
-                        self.paused = False
-
-                    button = self.pause_menu.handle_event(event)
-                    if button == "ПРОДОЛЖИТЬ":
-                        self.paused = False
-                    elif button == cfg.SETTINGS_BUTTON:
-                        self.pause_menu.state_change(cfg.SETTINGS_BUTTON)
-                    elif button == cfg.VOLUME_BUTTON:
-                        self.audio_manager.set_bgm_volume(self.pause_menu.volume / 100)
-                    elif button == cfg.BACK_BUTTON:
-                        self.pause_menu.state_change(cfg.BACK_BUTTON)
-                    elif button == cfg.EXIT_BUTTON:
-                        pygame.quit()
-                        return
-                continue
-
-            # === ИГРА АКТИВНА ===
-            self.handler.game_process_events(self, self.transition_manager, cam_x, cam_y, events)
+            self.handler.game_process_events(self.transition_manager, cam_x, cam_y)
             self._update(dt)
             self._draw(cam_x, cam_y)
 
-
-            # Обновляем экран ТОЛЬКО ОДИН РАЗ для обычной игры
             pygame.display.flip()
 
 
@@ -109,7 +66,7 @@ class Game:
 
         while self.running:
             events = pygame.event.get()
-            button_clicked = self.handler.menu_process_events(self, events)
+            button_clicked = self.handler.menu_process_events(events)
 
             if button_clicked == cfg.START_GAME_BUTTON:
                 self.run_intro()
@@ -125,7 +82,7 @@ class Game:
                 self.menu.state_change(cfg.BACK_BUTTON)
 
             dt = min(0.05, self.clock.tick(cfg.FPS) / 1000.0)
-            self.menu.draw(dt)
+            self.menu.draw()
             pygame.display.flip()
 
     def set_normal_mod(self):
@@ -158,12 +115,12 @@ class Game:
         self.cyber_core = CyberCore(core_x, core_y)
         self.player = Player(player_x, player_y)
         self.world.player = self.player
-        self.world.start_room = self._find_room_by_point(player_x, player_y)
+        self.world.start_room = self.dungeon_generator.find_room_by_point(player_x, player_y)
 
         self.terminal_intro = TerminalIntro(self.screen)
         self.world_renderer = WorldRenderer(self.screen, self.world, self.player, self.cyber_core)
         self.dark_renderer = DarkRenderer(self.screen, self.world, self.player, self.cyber_core)
-        self.handler = Handler(self.player, self.cyber_core, self.world)
+        self.handler = Handler(self, self.player, self.cyber_core, self.world)
         self.camera = Camera(cfg.SCREEN_WIDTH, cfg.SCREEN_HEIGHT)
         self.transition_manager = TransitionManager(self.screen, self.camera)
         self.audio_manager = AudioManager()
@@ -178,12 +135,6 @@ class Game:
         self.pause_overlay.fill((0, 0, 0, 180))
 
         self.pause_menu = PauseMenu(self.screen)
-
-    def _find_room_by_point(self, x: int, y: int):
-        for room in self.world.rooms:
-            if room.collidepoint(x, y):
-                return room
-        return self.world.rooms[0] if self.world.rooms else None
 
     def _death_player(self):
         self.world_renderer.draw_death_screen()
@@ -231,3 +182,4 @@ class Game:
 
         if self.paused:
             self.screen.blit(self.pause_overlay, (0, 0))
+            self.pause_menu.draw()
