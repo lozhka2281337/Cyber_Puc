@@ -93,13 +93,11 @@ class Player:
             self.ping_timer -= dt
 
     def _update_sprite(self, direction, dt):
-        # Поворот спрайта 
         if direction.x < 0:
             self.flip_x = False 
         elif direction.x > 0:
             self.flip_x = True 
 
-        # Обновление кадров 
         if direction.magnitude() > 0:
             self.anim.update(dt) 
         else:
@@ -120,7 +118,6 @@ class Player:
 
         self._update_sprite(direction, dt)
 
-        # обновление таймера пинга и щита бессмертия
         self._update_ping_timer(dt)
         self._update_shield_timer(dt)
 
@@ -128,17 +125,14 @@ class Player:
         screen_x = self.rect.x - cam_x
         screen_y = self.rect.y - cam_y
         
-        #  Отрисовка спрайта вместо квадратов, короче тут получаем нужный кадр( если нужно ,то перевернутый)
         frame = self.anim.get_frame(self.flip_x)
         
-        # Вычисляем центр хитбокса
         center_x = screen_x + self.rect.width // 2
         center_y = screen_y + self.rect.height // 2
         
         # Центруем ее по хитбоксу 
         frame_rect = frame.get_rect(center=(center_x, center_y))
         
-        # Рисуем
         surface.blit(frame, frame_rect)
 
         if self.invulnerable_timer > 0: self._draw_shield(surface, screen_x, screen_y)
