@@ -27,6 +27,7 @@ none_font = pygame.font.SysFont(None, 32, bold=True)
 MENU_MUSIC = "music/The_Browning-EndOfExistence.mp3"
 INTRO_MUSIC = "music/80_s-Computer-Interface.mp3"
 ACTION_MUSIC = "music/doom_02.Rip_and_Tear.mp3"
+WIN_MUSIC = "music/IllNiño-HowCanILive.mp3"
 DARK_MUSIC = "music/MartinStigAndersenSGunverRyberg-Submarine.mp3"
 BOOM_SOUND = "music/deafening-explosion-from-a-shot.mp3"
 
@@ -238,7 +239,7 @@ SCRIPT_WIN = [
     (">> ЗАПРОС С СЕРВЕРА КОРПОРАЦИИ: 'Вернитесь в сектор утилизации'", "RED"),
     (">> ОТВЕТ СИСТЕМЫ КИБОРГА: ДОСТУП ЗАБЛОКИРОВАН. ОТКАЗ", "RED"),
     (">> ЗАМЕТКА ХАКЕРА: 'Ты сделал это, брат. Твой разум снова твой.'", "BLUE"),
-    (">> ЗАМЕТКА ХАКЕРА: 'Они думали, что сотрели тебя навсегда.'", "BLUE"),
+    (">> ЗАМЕТКА ХАКЕРА: 'Они думали, что стерли тебя навсегда.'", "BLUE"),
     (">> ЗАМЕТКА ХАКЕРА: 'Выходи наружу. Пора показать им истинного Жнеца.'", "BLUE"),
     (">> --------------------------------------------------", "GREEN"),
     (">> НАД ПРОЕКТОМ РАБОТАЛА КОМАНДА 'БУРМАЛДА':", "PURPLE"),

@@ -26,7 +26,7 @@ class Terminal:
         self.current_char_idx = 0
         self.next_action_time = pygame.time.get_ticks() + 200
 
-    def update(self) -> bool:
+    def update(self, audio_manager) -> bool:
         current_time = pygame.time.get_ticks()
 
         if current_time >= self.next_action_time:
@@ -38,7 +38,10 @@ class Terminal:
                 self._update_new_char(current_full_line, color_type)
                 self._update_line_end(current_full_line, current_time)
             else:
-                return True 
+                if self.script == cfg.SCRIPT_WIN: 
+                    if not audio_manager.bmg_is_playing():
+                        return False
+                else: return False
                 
         return False
 

@@ -17,7 +17,6 @@ from core.spawner import Spawner
 from core.audio_manager import AudioManager
 
 from menu.main_menu import MainMenu
-from menu.pause_menu import PauseMenu
 from menu.terminal import Terminal
 
 import config as cfg
@@ -30,9 +29,9 @@ class Game:
 
         self.screen = pygame.display.set_mode((cfg.SCREEN_WIDTH, cfg.SCREEN_HEIGHT))
         self.clock = pygame.time.Clock()
+        self.volume = 100
 
-        self.menu = MainMenu(self.screen)
-        self.pause_menu = PauseMenu(self.screen)
+        self.menu = MainMenu(self, self.screen)
         self.camera = Camera(cfg.SCREEN_WIDTH, cfg.SCREEN_HEIGHT)
         self.transition_manager = TransitionManager(self.screen, self.camera)
         self.audio_manager = AudioManager()
@@ -42,7 +41,9 @@ class Game:
     def run_terminal(self, script):
         self.terminal = Terminal(self.screen, self.player.score, script)
 
-        if script == cfg.SCRIPT_LOSE: 
+        if script == cfg.SCRIPT_WIN:
+            self.audio_manager.play_bgm(cfg.WIN_MUSIC)
+        elif script == cfg.SCRIPT_LOSE: 
             self.audio_manager.play_bgm(cfg.BOOM_SOUND)
             self.audio_manager.queue_bgm(cfg.INTRO_MUSIC)
         else:
@@ -51,7 +52,7 @@ class Game:
         while self.running:
             self.handler.intro_process_events()
 
-            if self.terminal.update(): break
+            if self.terminal.update(self.audio_manager): break
             self.terminal.draw()
 
             pygame.display.flip()
@@ -69,12 +70,14 @@ class Game:
             dt = self.get_dt()
             cam_x, cam_y = self.camera.get_offset(self.player.rect)
 
-            self.handler.game_process_events(cam_x, cam_y)
-
-            if not self.paused: self._update(dt)
-            else: self.pause_menu.update(dt)
-
-            self._draw(cam_x, cam_y)
+            if not self.paused: 
+                self._update(dt)
+                self.handler.game_process_events(cam_x, cam_y)
+                self._draw(cam_x, cam_y)
+            else: 
+                self.menu.update(dt)
+                self.handler.menu_process_events()
+                self.menu.draw()
 
             pygame.display.flip()
 
@@ -128,7 +131,7 @@ class Game:
 
         self.world_renderer = WorldRenderer(self.screen, self.world, self.player, self.elevator, self.cyber_core)
         self.dark_renderer = DarkRenderer(self.screen, self.world, self.player, self.cyber_core)
-        self.handler = Handler(self, self.player, self.cyber_core, self.world)
+        self.handler = Handler(self, self.player, self.cyber_core)
         self.boss_arena = BossArena(self.world)
 
         self.spawner = Spawner(self.world, self.dungeon_generator, self.player)
@@ -139,7 +142,7 @@ class Game:
         self.paused = False
 
     def _death_player(self):
-        self.run_terminal(cfg.SCRIPT_LOSE)
+        self.run_terminal(cfg.SCRIPT_WIN)
 
     def _update(self, dt: float):
         self.camera.update(dt)
@@ -204,7 +207,3 @@ class Game:
             self.dark_renderer.draw(cam_x, cam_y)
         self.world_renderer.draw_interface()
         self.transition_manager.draw_flash() # отрисовка ослепления при переходе на активный режим
-
-        if self.paused:
-            self.screen.blit(self.pause_menu.pause_overlay, (0, 0))
-            self.pause_menu.draw()
