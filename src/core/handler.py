@@ -17,6 +17,9 @@ class Handler:
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     self.game.running = False
+                if event.key in (pygame.K_SPACE, pygame.K_RETURN):
+                    if hasattr(self.game, "terminal") and self.game.terminal:
+                        self.game.terminal.skip()
 
     def game_process_events(self, camera_x: float, camera_y: float):
         for event in pygame.event.get():
@@ -54,34 +57,29 @@ class Handler:
                 self.player.ping(self.game.world)
 
             if event.key == pygame.K_1:
-                self.player.inventory.set_weapon(0)
+                self.player.select_weapon(0, self.game.world)
             if event.key == pygame.K_2:
-                self.player.inventory.set_weapon(1)
+                self.player.select_weapon(1, self.game.world)
             if event.key == pygame.K_3:
-                self.player.inventory.set_weapon(2)
+                self.player.select_weapon(2, self.game.world)
             if event.key == pygame.K_4:
-                self.player.inventory.set_weapon(3)
+                self.player.select_weapon(3, self.game.world)
             if event.key == pygame.K_5:
-                self.player.inventory.set_weapon(4)
+                self.player.select_weapon(4, self.game.world)
 
         if event.type == pygame.MOUSEBUTTONDOWN:
             if event.button == 4:
-                self.player.switch_weapon(forward=False)
+                self.player.switch_weapon(forward=False, world=self.game.world)
             if event.button == 5:
-                self.player.switch_weapon(forward=True)
+                self.player.switch_weapon(forward=True, world=self.game.world)
             if event.button == 1:
                 self.player.shot(camera_x, camera_y, self.game.world)
 
         if self.game.world.mod == cfg.DARK_MOD:
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_e:
-                    was_dark = self.game.world.mod == cfg.DARK_MOD
-                    if self.cyber_core.core_activate(self.player):
+                    if self.cyber_core and self.cyber_core.core_activate(self.player):
                         self.game.set_normal_mod()
-                        self.game.elevator.activate()
-
-                    if was_dark and self.game.world.core_activated and not self.game.world.boss_spawned:
-                        self.game.spawn_boss_in_start_room()
                         self.game.transition_manager.trigger_transition()
 
     def _process_pause_event(self, event):

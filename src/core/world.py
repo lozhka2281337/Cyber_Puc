@@ -16,6 +16,9 @@ class World:
         self.core_activated = False
         self.boss_spawned = False
         self.start_room = None
+        self.first_floor_exit_open = False
+        self.second_floor_wave_spawned = False
+        self.second_floor_boss_spawned = False
 
         self.matrix = []
 

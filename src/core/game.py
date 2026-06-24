@@ -95,19 +95,53 @@ class Game:
         self.world.core_activated = True
         self.audio_manager.play_bgm(cfg.ACTION_MUSIC)
 
-    def spawn_boss_in_start_room(self):
+    def _has_alive_non_boss_enemies(self) -> bool:
+        for enemy in self.world.enemies:
+            if enemy.hp > 0 and not isinstance(enemy, Boss):
+                return True
+        return False
+
+    def _spawn_boss_in_arena(self):
         if self.world.boss_spawned:
             return
-        if self.world.start_room is None:
-            return
 
-        room = self.world.start_room
-        boss_x = room.centerx - 32
-        boss_y = room.centery - 32
+        center_px_x = self.boss_arena.center_x * cfg.TILE_SIZE
+        center_px_y = self.boss_arena.center_y * cfg.TILE_SIZE
+        boss_x = center_px_x - cfg.BOSS_SIZE // 2
+        boss_y = center_px_y - cfg.BOSS_SIZE // 2
 
-        boss = Boss(boss_x, boss_y, room)
+        arena_radius_px = max(6 * cfg.TILE_SIZE, (self.boss_arena.arena_radius - 3) * cfg.TILE_SIZE)
+        arena_room = pygame.Rect(
+            center_px_x - arena_radius_px,
+            center_px_y - arena_radius_px,
+            arena_radius_px * 2,
+            arena_radius_px * 2,
+        )
+
+        boss = Boss(boss_x, boss_y, arena_room)
         self.world.enemies.append(boss)
         self.world.boss_spawned = True
+
+    def _update_level_progression(self):
+        if self.world.mod != cfg.BOSS_MOD:
+            if (
+                self.world.core_activated
+                and not self.world.first_floor_exit_open
+                and not self._has_alive_non_boss_enemies()
+            ):
+                self.world.first_floor_exit_open = True
+                self.elevator.activate()
+                self.transition_manager.trigger_transition()
+            return
+
+        if (
+            self.world.second_floor_wave_spawned
+            and not self.world.second_floor_boss_spawned
+            and not self._has_alive_non_boss_enemies()
+        ):
+            self.world.second_floor_boss_spawned = True
+            self._spawn_boss_in_arena()
+            self.transition_manager.trigger_transition()
 
     def get_dt(self):
         return min(0.05, self.clock.tick(cfg.FPS) / 1000.0)
@@ -167,6 +201,8 @@ class Game:
             self.player.up_score()
             self.world.enemies.remove(enemy)
 
+        self._update_level_progression()
+
         for item in self.world.items[:]:
             if self.player.rect.colliderect(item.rect):
                 if self.player.hp < cfg.PLAYER_HP:
@@ -176,22 +212,34 @@ class Game:
         if self.player.hp <= 0:
             self._death_player()
 
-        if self.elevator.check_trigger(self.player) and self.world.mod != cfg.BOSS_MOD:
+        if (
+            self.elevator.check_trigger(self.player)
+            and self.world.mod != cfg.BOSS_MOD
+            and self.world.first_floor_exit_open
+        ):
             self._start_second_level()
 
     def _start_second_level(self):
         self.world.mod = cfg.BOSS_MOD
+        self.world.boss_spawned = False
+        self.world.second_floor_wave_spawned = False
+        self.world.second_floor_boss_spawned = False
 
         self.cyber_core = None
 
         self.world.clear_map()
 
-        self.player.pos.x = (cfg.MAP_WIDTH // 2 * cfg.TILE_SIZE) - self.player.rect.width // 2
-        self.player.pos.y = (cfg.MAP_WIDTH // 2 * cfg.TILE_SIZE) - self.player.rect.height // 2 + 15 * cfg.TILE_SIZE
+        center_x_px = self.boss_arena.center_x * cfg.TILE_SIZE
+        center_y_px = self.boss_arena.center_y * cfg.TILE_SIZE
+        self.player.pos.x = center_x_px - self.player.rect.width // 2
+        self.player.pos.y = center_y_px - self.player.rect.height // 2 + 15 * cfg.TILE_SIZE
         self.elevator.rect.x = self.player.pos.x
         self.elevator.rect.y = self.player.pos.y
+        self.elevator.is_active = False
 
         self.boss_arena.create_arena()
+        self.spawner.spawn_second_floor_wave()
+        self.world.second_floor_wave_spawned = True
         self.world_renderer.init_map_surface()
 
     def _draw(self, cam_x, cam_y):

@@ -16,6 +16,23 @@ class Spawner:
         self._spawn_enemies()
         self._spawn_items()
 
+    def spawn_second_floor_wave(self):
+        enemy_count = random.randint(cfg.SECOND_FLOOR_WAVE_MIN, cfg.SECOND_FLOOR_WAVE_MAX)
+        arena_room = pygame.Rect(0, 0, cfg.MAP_WIDTH * cfg.TILE_SIZE, cfg.MAP_HEIGHT * cfg.TILE_SIZE)
+
+        for _ in range(enemy_count):
+            spawn_x, spawn_y = self._get_safe_arena_spawn_pos(cfg.ENEMY_SIZE)
+
+            roll = random.random()
+            if roll < 0.2:
+                enemy = Tank(spawn_x, spawn_y, arena_room)
+            elif roll < 0.5:
+                enemy = Shooter(spawn_x, spawn_y, arena_room)
+            else:
+                enemy = Swarm(spawn_x, spawn_y, arena_room)
+
+            self.world.enemies.append(enemy)
+
     def _spawn_enemies(self):
         spawned_count = 0
         shuffled_rooms = random.sample(self.world.rooms, len(self.world.rooms))
@@ -67,3 +84,26 @@ class Spawner:
             y = room.centery - entity_size // 2
             
         return x, y
+
+    def _get_safe_arena_spawn_pos(self, entity_size: int) -> tuple[int, int]:
+        floor_tiles = []
+        player_tile_x = int(self.player.pos.x // cfg.TILE_SIZE)
+        player_tile_y = int(self.player.pos.y // cfg.TILE_SIZE)
+
+        for y in range(cfg.MAP_HEIGHT):
+            for x in range(cfg.MAP_WIDTH):
+                if self.world.matrix[y][x] != 0:
+                    continue
+
+                if abs(x - player_tile_x) <= 4 and abs(y - player_tile_y) <= 4:
+                    continue
+
+                floor_tiles.append((x, y))
+
+        if not floor_tiles:
+            return self.player.rect.centerx, self.player.rect.centery
+
+        tile_x, tile_y = random.choice(floor_tiles)
+        spawn_x = tile_x * cfg.TILE_SIZE + (cfg.TILE_SIZE - entity_size) // 2
+        spawn_y = tile_y * cfg.TILE_SIZE + (cfg.TILE_SIZE - entity_size) // 2
+        return spawn_x, spawn_y

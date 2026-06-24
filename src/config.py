@@ -188,6 +188,11 @@ LOSE_AGRO_DISTANCE = 600    # Дистанция, на которой забыв
 WAYPOINT_TOLERANCE = 10     # Погрешность прибытия на точку (в пикселях)
 
 INITIAL_ENEMY_COUNT = 15    # Точное количество врагов при генерации уровня 
+SECOND_FLOOR_WAVE_MIN = 5
+SECOND_FLOOR_WAVE_MAX = 5
+ENEMY_STEALTH_POWER_MULTIPLIER = 0.5
+ENEMY_STEALTH_AGRO_MULTIPLIER = 0.7
+ENEMY_STEALTH_SHOOT_COOLDOWN_MULTIPLIER = 1.8
 
 
 """ меню """
