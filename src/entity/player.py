@@ -24,11 +24,29 @@ class Player:
         self.ping_timer = 0
         self.score = 0
     
-    def switch_weapon(self, forward: bool):
+    def _scanner_only_mode(self, world) -> bool:
+        return world.mod == cfg.DARK_MOD and not world.core_activated
+
+    def _enforce_weapon_restriction(self, world) -> None:
+        if self._scanner_only_mode(world):
+            self.inventory.set_weapon(0)
+
+    def switch_weapon(self, forward: bool, world=None):
+        if world is not None and self._scanner_only_mode(world):
+            self.inventory.set_weapon(0)
+            return
+
         if forward:
             self.inventory.next_weapon()
         else:
             self.inventory.prev_weapon()
+
+    def select_weapon(self, index: int, world=None):
+        if world is not None and self._scanner_only_mode(world):
+            self.inventory.set_weapon(0)
+            return
+
+        self.inventory.set_weapon(index)
 
     def _check_enemy_collisions(self, enemies):
         for enemy in enemies:
@@ -36,6 +54,7 @@ class Player:
                 self.get_damage(enemy.damage)
 
     def shot(self, camera_x: int, camera_y: int, world) -> None:
+        self._enforce_weapon_restriction(world)
         self.inventory.get_current().shot(self.pos, camera_x, camera_y, world)
 
     def ping(self, world):
@@ -66,6 +85,7 @@ class Player:
         if keys[pygame.K_a] or keys[pygame.K_LEFT]: direction.x -= 1
         if keys[pygame.K_d] or keys[pygame.K_RIGHT]: direction.x += 1
         
+        self._enforce_weapon_restriction(world)
         self.inventory.update_all()
 
         self._movement(direction, dt, world.walls)

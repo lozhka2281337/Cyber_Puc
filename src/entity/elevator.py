@@ -6,7 +6,7 @@ class Elevator:
     def __init__(self, x, y):
         self.rect = pygame.Rect(x, y, cfg.TILE_SIZE * 2, cfg.TILE_SIZE * 2)
         
-        self.is_active = True#False
+        self.is_active = False
         
         self.animation_timer = 0.0
 

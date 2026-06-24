@@ -2,6 +2,7 @@ import pygame
 from core.animation import Animation
 from .enemy import Enemy, AnimatedEnemy
 from projectile.bullet import Bullet
+import config as cfg
 from config import (ENEMY_SWARM_HP, ENEMY_SWARM_SPEED, ENEMY_SWARM_COLOR, ENEMY_SWARM_ATTACK_RANGE,
                     ENEMY_TANK_HP, ENEMY_TANK_SPEED, ENEMY_TANK_COLOR, ENEMY_TANK_ATTACK_RANGE, ENEMY_TANK_DAMAGE,
                     ENEMY_SHOOTER_HP, ENEMY_SHOOTER_SPEED, ENEMY_SHOOTER_COLOR, ENEMY_SHOOTER_ATTACK_RANGE, ENEMY_SHOOTER_DAMAGE,
@@ -14,6 +15,7 @@ class Swarm(AnimatedEnemy):
         super().__init__(x, y, ENEMY_SWARM_HP, ENEMY_SWARM_SPEED, ENEMY_SWARM_COLOR, room)
         self.attack_range = ENEMY_SWARM_ATTACK_RANGE
         self.damage = 1
+        self.base_damage = self.damage
         self.anim_left = Animation("assets/fast-enemy-run-left.png", columns=5, speed=0.1, scale=1.5)
         self.anim_right = Animation("assets/fast-enemy-run-right.png", columns=5, speed=0.1, scale=1.5)
         self.current_anim = self.anim_right
@@ -25,6 +27,7 @@ class Tank(AnimatedEnemy):
         super().__init__(x, y, ENEMY_TANK_HP, ENEMY_TANK_SPEED, ENEMY_TANK_COLOR, room)
         self.attack_range = ENEMY_TANK_ATTACK_RANGE
         self.damage = ENEMY_TANK_DAMAGE
+        self.base_damage = self.damage
         self.anim_left = Animation("assets/tank-sprite-left.png", columns=4, speed=0.25, scale=2.5)
         self.anim_right = Animation("assets/tank-sprite-right.png", columns=4, speed=0.25, scale=2.5)
         self.current_anim = self.anim_right
@@ -36,6 +39,7 @@ class Shooter(AnimatedEnemy):
         super().__init__(x, y, ENEMY_SHOOTER_HP, ENEMY_SHOOTER_SPEED, ENEMY_SHOOTER_COLOR, room)
         self.attack_range = ENEMY_SHOOTER_ATTACK_RANGE
         self.damage = ENEMY_SHOOTER_DAMAGE
+        self.base_damage = self.damage
         self.last_shot_time = 0
         self.shoot_cooldown = SHOOTER_SHOOT_COOLDOWN
         self.anim_left = Animation("assets/shooter-left-run-Sheet.png", columns=6, speed=0.25, scale=1.5)
@@ -62,7 +66,11 @@ class Shooter(AnimatedEnemy):
 
     def _attempt_shoot(self, player, world) -> None:
         current_time = pygame.time.get_ticks()
-        if current_time - self.last_shot_time >= self.shoot_cooldown and world.bullets is not None:
+        cooldown = self.shoot_cooldown
+        if world.mod == cfg.DARK_MOD and not world.core_activated:
+            cooldown = int(cooldown * cfg.ENEMY_STEALTH_SHOOT_COOLDOWN_MULTIPLIER)
+
+        if current_time - self.last_shot_time >= cooldown and world.bullets is not None:
             self.last_shot_time = current_time
             self._fire_bullet(player, world.bullets)
 

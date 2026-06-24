@@ -19,6 +19,9 @@ class Handler:
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     self.game.running = False
+                if event.key in (pygame.K_SPACE, pygame.K_RETURN):
+                    if hasattr(self.game, "terminal") and self.game.terminal:
+                        self.game.terminal.skip()
 
     def game_process_events(self, camera_x: float, camera_y: float):
         for event in pygame.event.get():

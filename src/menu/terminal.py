@@ -19,14 +19,22 @@ class Terminal:
         self.char_speed = 40
         self.line_delay = 1000  
         self.next_action_time = 0  
+        self.skip_requested = False
 
     def start(self):
         self.lines_to_draw = []
         self.current_line_idx = 0
         self.current_char_idx = 0
         self.next_action_time = pygame.time.get_ticks() + 200
+        self.skip_requested = False
+
+    def skip(self):
+        self.skip_requested = True
 
     def update(self, audio_manager) -> bool:
+        if self.skip_requested:
+            return True
+
         current_time = pygame.time.get_ticks()
 
         if current_time >= self.next_action_time:
