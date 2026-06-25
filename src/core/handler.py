@@ -67,15 +67,15 @@ class Handler:
                 self.player.ping(self.game.world)
 
             if event.key == pygame.K_1:
-                self.player.select_weapon(0, self.game.world)
+                self.player.select_weapon(0)
             if event.key == pygame.K_2:
-                self.player.select_weapon(1, self.game.world)
+                self.player.select_weapon(1)
             if event.key == pygame.K_3:
-                self.player.select_weapon(2, self.game.world)
+                self.player.select_weapon(2)
             if event.key == pygame.K_4:
-                self.player.select_weapon(3, self.game.world)
+                self.player.select_weapon(3)
             if event.key == pygame.K_5:
-                self.player.select_weapon(4, self.game.world)
+                self.player.select_weapon(4)
 
         if event.type == pygame.MOUSEBUTTONDOWN:
             if event.button == 4:
